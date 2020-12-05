@@ -20,11 +20,12 @@ import (
 )
 
 const (
-	envVarConfigDir         = "MAILTO_THINGS_CONFIG_DIR"
-	envVarIncomingEmail     = "MAILTO_THINGS_INCOMING_EMAIL"
-	envVarOutgoingEmail     = "MAILTO_THINGS_OUTGOING_EMAIL"
-	envVarAttachmentsDir    = "MAILTO_THINGS_ATTACHMENTS_DIR"
-	envVarAttachmentsDirURL = "MAILTO_THINGS_ATTACHMENTS_DIR_URL"
+	envVarConfigDir            = "MAILTO_THINGS_CONFIG_DIR"
+	envVarIncomingEmail        = "MAILTO_THINGS_INCOMING_EMAIL"
+	envVarOutgoingEmail        = "MAILTO_THINGS_OUTGOING_EMAIL"
+	envVarAttachmentsDir       = "MAILTO_THINGS_ATTACHMENTS_DIR"
+	envVarAttachmentsDirURL    = "MAILTO_THINGS_ATTACHMENTS_DIR_URL"
+	envVarDontTouchOrigMessage = "MAILTO_THINGS_DONT_TOUCH_ORIG_MESSAGE"
 )
 
 var (
@@ -138,11 +139,13 @@ func Main() error {
 			return fmt.Errorf("failed to send message to Things (%s): %w", MustGetenv(envVarOutgoingEmail), err)
 		}
 
-		if _, err := srv.Users.Messages.Modify("me", m.Id, &gmail.ModifyMessageRequest{RemoveLabelIds: []string{"UNREAD"}}).Context(ctx).Do(); err != nil {
-			return fmt.Errorf("failed to mark message %s as read", m.Id)
-		}
-		if _, err := srv.Users.Messages.Trash("me", m.Id).Context(ctx).Do(); err != nil {
-			return fmt.Errorf("failed to trash message %s", m.Id)
+		if !GetenvBool(envVarDontTouchOrigMessage, false) {
+			if _, err := srv.Users.Messages.Modify("me", m.Id, &gmail.ModifyMessageRequest{RemoveLabelIds: []string{"UNREAD"}}).Context(ctx).Do(); err != nil {
+				return fmt.Errorf("failed to mark message %s as read", m.Id)
+			}
+			if _, err := srv.Users.Messages.Trash("me", m.Id).Context(ctx).Do(); err != nil {
+				return fmt.Errorf("failed to trash message %s", m.Id)
+			}
 		}
 
 		log.Printf("processsed message %s (\"%s\")", m.Id, subject)
@@ -189,7 +192,6 @@ func processPayloadReturningOutgoingBody(ctx context.Context, srv *gmail.Service
 		return "", nil
 	}
 }
-
 
 func writeAttachmentFromPartReturningURL(ctx context.Context, srv *gmail.Service, messageId string, part *gmail.MessagePart, fileCreateMode, dirCreateMode os.FileMode) (string, error) {
 	dir, dirURL, err := attachmentsDirAndURL(messageId, dirCreateMode)

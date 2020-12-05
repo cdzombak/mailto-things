@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strconv"
 )
 
 // MustGetenv returns the value of the environment variable with the given name,
@@ -13,6 +14,15 @@ func MustGetenv(key string) string {
 		log.Fatalf("required environment variable '%s' is missing", key)
 	}
 	return retv
+}
+
+// GetenvBool returns the given environment variable as a bool, or returns the given default value if the env variable is not set.
+func GetenvBool(name string, defaultVal bool) bool {
+	valStr := os.Getenv(name)
+	if val, err := strconv.ParseBool(valStr); err == nil {
+		return val
+	}
+	return defaultVal
 }
 
 // WriteFileExcl writes the given data to a file named by filename.
