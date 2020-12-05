@@ -17,4 +17,4 @@ clean:
 
 .PHONY: deploy-burr
 deploy-burr: clean build-linux-amd64
-	scp ./out/mailto-things burr:~/mailto-things
+	scp ./out/linux-amd64/mailto-things burr:~/mailto-things
