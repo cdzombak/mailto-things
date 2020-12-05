@@ -118,7 +118,7 @@ func Main() error {
 		log.Printf("found %d messages to process", len(messagesToProcess))
 	}
 
-	bmPolicy := bluemonday.UGCPolicy()
+	bmPolicy := bluemonday.NewPolicy()
 
 	for _, m := range messagesToProcess {
 		subject := MessageSubject(m)
