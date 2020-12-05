@@ -28,7 +28,7 @@ const (
 )
 
 var (
-	configDirFlag         = flag.String("configDirFlag", "", "Path to the directory where Gmail app credentials & user tokens are stored. Overrides environment variable MAILTO_THINGS_CONFIG_DIR.")
+	configDirFlag         = flag.String("configDir", "", "Path to the directory where Gmail app credentials & user tokens are stored. Overrides environment variable MAILTO_THINGS_CONFIG_DIR.")
 	attachmentsDirFlag    = flag.String("attachmentsDir", "", "Path to the directory where attachments are stored. Overrides environment variable MAILTO_THINGS_ATTACHMENTS_DIR.")
 	attachmentsDirURLFlag = flag.String("attachmentsDirURL", "", "URL to the directory where attachments are stored. Should not end with a slash. Overrides environment variable MAILTO_THINGS_ATTACHMENTS_DIR_URL.")
 	incomingEmailFlag     = flag.String("incomingEmail", "", "Email address which receives tasks with attachments. Overrides environment variable MAILTO_THINGS_INCOMING_EMAIL.")
