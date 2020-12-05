@@ -125,9 +125,13 @@ func Main() error {
 
 	for _, m := range messagesToProcess {
 		subject := MessageSubject(m)
-		outgoingBody, err := processPayloadReturningOutgoingBody(ctx, srv, mdConv, m.Id, m.Payload, fileCreateMode, dirCreateMode)
+		outgoingBody, cidMap, err := processPayload(ctx, srv, mdConv, m.Id, m.Payload, fileCreateMode, dirCreateMode)
 		if err != nil {
 			return err
+		}
+
+		for cid, url := range cidMap {
+			outgoingBody = strings.ReplaceAll(outgoingBody, "cid:"+cid, url)
 		}
 
 		var outgoingMessage gmail.Message
@@ -154,57 +158,62 @@ func Main() error {
 	return nil
 }
 
-func processPayloadReturningOutgoingBody(ctx context.Context, srv *gmail.Service, mdConv *md.Converter, messageId string, payload *gmail.MessagePart, fileCreateMode, dirCreateMode os.FileMode) (string, error) {
+// processPayload returns the text representing this payload part, and a map of CID -> URL for any attachments processed in the part.
+func processPayload(ctx context.Context, srv *gmail.Service, mdConv *md.Converter, messageId string, payload *gmail.MessagePart, fileCreateMode, dirCreateMode os.FileMode) (string, map[string]string, error) {
 	if payload.MimeType == "text/plain" {
 		bodyBytes, err := base64.URLEncoding.DecodeString(payload.Body.Data)
 		if err != nil {
-			return "", err
+			return "", nil, err
 		}
-		return string(bodyBytes), nil
+		return string(bodyBytes), nil, nil
 	} else if payload.MimeType == "text/html" {
 		bodyBytes, err := base64.URLEncoding.DecodeString(payload.Body.Data)
 		if err != nil {
-			return "", err
+			return "", nil, err
 		}
 		parsed, err := mdConv.ConvertString(string(bodyBytes))
 		if err != nil {
-			return "", err
+			return "", nil, err
 		}
-		return parsed + "\r\n\r\n", nil
+		return parsed + "\r\n\r\n", nil, nil
 	} else if payload.MimeType == "multipart/alternative" || payload.MimeType == "multipart/related" {
 		outgoingBody := ""
+		cidMap := make(map[string]string)
 		for _, part := range payload.Parts {
-			partBody, err := processPayloadReturningOutgoingBody(ctx, srv, mdConv, messageId, part, fileCreateMode, dirCreateMode)
+			partBody, partCidMap, err := processPayload(ctx, srv, mdConv, messageId, part, fileCreateMode, dirCreateMode)
 			if err != nil {
-				return "", err
+				return "", nil, err
 			}
 			outgoingBody = outgoingBody + partBody
+			for k, v := range partCidMap {
+				cidMap[k] = v
+			}
 		}
-		return outgoingBody, nil
+		return outgoingBody, cidMap, nil
 	} else if payload.Body.AttachmentId != "" {
-		attachmentUrl, err := writeAttachmentFromPartReturningURL(ctx, srv, messageId, payload, fileCreateMode, dirCreateMode)
+		attachmentUrl, cid, err := writeAttachmentFromPartReturningURLAndCID(ctx, srv, messageId, payload, fileCreateMode, dirCreateMode)
 		if err != nil {
-			return "", err
+			return "", nil, err
 		}
-		return attachmentUrl + "\r\n\r\n", nil
+		return attachmentUrl + "\r\n\r\n", map[string]string{ cid: attachmentUrl }, nil
 	} else {
 		log.Printf("warning: could not parse message part %v", *payload)
-		return "", nil
+		return "", nil, nil
 	}
 }
 
-func writeAttachmentFromPartReturningURL(ctx context.Context, srv *gmail.Service, messageId string, part *gmail.MessagePart, fileCreateMode, dirCreateMode os.FileMode) (string, error) {
+func writeAttachmentFromPartReturningURLAndCID(ctx context.Context, srv *gmail.Service, messageId string, part *gmail.MessagePart, fileCreateMode, dirCreateMode os.FileMode) (string, string, error) {
 	dir, dirURL, err := attachmentsDirAndURL(messageId, dirCreateMode)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	response, err := srv.Users.Messages.Attachments.Get("me", messageId, part.Body.AttachmentId).Context(ctx).Do()
 	if err != nil {
-		return "", fmt.Errorf("failed to download attachment %s for message %s: %w", part.Body.AttachmentId, messageId, err)
+		return "", "", fmt.Errorf("failed to download attachment %s for message %s: %w", part.Body.AttachmentId, messageId, err)
 	}
 	data, err := base64.URLEncoding.DecodeString(response.Data)
 	if err != nil {
-		return "", fmt.Errorf("failed to decode attachment %s for message %s: %w", part.Body.AttachmentId, messageId, err)
+		return "", "", fmt.Errorf("failed to decode attachment %s for message %s: %w", part.Body.AttachmentId, messageId, err)
 	}
 	attachmentFilename := part.Filename
 	if attachmentFilename == "" {
@@ -228,13 +237,13 @@ func writeAttachmentFromPartReturningURL(ctx context.Context, srv *gmail.Service
 			i++
 			continue
 		} else if err != nil {
-			return "", fmt.Errorf("failed to write attachment %s for message %s to path %s: %w", part.Body.AttachmentId, messageId, fullFilePath, err)
+			return "", "", fmt.Errorf("failed to write attachment %s for message %s to path %s: %w", part.Body.AttachmentId, messageId, fullFilePath, err)
 		} else {
 			writtenAttachmentName = filepath.Base(fullPathToTryWriting)
 			break
 		}
 	}
-	return dirURL + "/" + url.PathEscape(writtenAttachmentName), nil
+	return dirURL + "/" + url.PathEscape(writtenAttachmentName), PartCID(part), nil
 }
 
 func attachmentsDirAndURL(messageId string, dirCreateMode os.FileMode) (string, string, error) {

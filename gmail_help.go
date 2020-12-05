@@ -16,3 +16,17 @@ func MessageSubject(message *gmail.Message) string {
 	}
 	return ""
 }
+
+// PartCID returns the content of the Content-ID header of the given
+// Gmail message part, if it has one; else the empty string.
+func PartCID(part *gmail.MessagePart) string {
+	for _, h := range part.Headers {
+		if strings.ToLower(h.Name) == "content-id" {
+			v := h.Value
+			v = strings.TrimPrefix(v, "<")
+			v = strings.TrimSuffix(v, ">")
+			return v
+		}
+	}
+	return ""
+}
