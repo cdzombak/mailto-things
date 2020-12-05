@@ -122,31 +122,9 @@ func Main() error {
 
 	for _, m := range messagesToProcess {
 		subject := MessageSubject(m)
-		outgoingBody := ""
-		attachmentCount := 0
-		for _, part := range m.Payload.Parts {
-			if part.MimeType == "text/plain" {
-				bodyBytes, err := base64.StdEncoding.DecodeString(part.Body.Data)
-				if err != nil {
-					return err
-				}
-				outgoingBody = outgoingBody + string(bodyBytes)
-			} else if part.MimeType == "text/html" {
-				bodyBytes, err := base64.StdEncoding.DecodeString(part.Body.Data)
-				if err != nil {
-					return err
-				}
-				outgoingBody = outgoingBody + bmPolicy.Sanitize(string(bodyBytes))
-			} else if part.Body.AttachmentId != "" {
-				attachmentUrl, err := writeAttachmentFromPartReturningURL(ctx, srv, m.Id, part, fileCreateMode, dirCreateMode)
-				if err != nil {
-					return err
-				}
-				outgoingBody = outgoingBody + attachmentUrl
-				attachmentCount++
-			} else {
-				log.Printf("warning: could not parse message part %v", *part)
-			}
+		outgoingBody, err := processPayloadReturningOutgoingBody(ctx, srv, bmPolicy, m.Id, m.Payload, fileCreateMode, dirCreateMode)
+		if err != nil {
+			return err
 		}
 
 		var outgoingMessage gmail.Message
@@ -165,11 +143,47 @@ func Main() error {
 			return fmt.Errorf("failed to trash message %s", m.Id)
 		}
 
-		log.Printf("processsed message %s (\"%s\") with %d attachments", m.Id, subject, attachmentCount)
+		log.Printf("processsed message %s (\"%s\")", m.Id, subject)
 	}
 
 	return nil
 }
+
+func processPayloadReturningOutgoingBody(ctx context.Context, srv *gmail.Service, bmPolicy *bluemonday.Policy, messageId string, payload *gmail.MessagePart, fileCreateMode, dirCreateMode os.FileMode) (string, error) {
+	if payload.MimeType == "text/plain" {
+		bodyBytes, err := base64.URLEncoding.DecodeString(payload.Body.Data)
+		if err != nil {
+			return "", err
+		}
+		return string(bodyBytes), nil
+	} else if payload.MimeType == "text/html" {
+		bodyBytes, err := base64.URLEncoding.DecodeString(payload.Body.Data)
+		if err != nil {
+			return "", err
+		}
+		return bmPolicy.Sanitize(string(bodyBytes)) + "\r\n\r\n", nil
+	} else if payload.MimeType == "multipart/alternative" || payload.MimeType == "multipart/related" {
+		outgoingBody := ""
+		for _, part := range payload.Parts {
+			partBody, err := processPayloadReturningOutgoingBody(ctx, srv, bmPolicy, messageId, part, fileCreateMode, dirCreateMode)
+			if err != nil {
+				return "", err
+			}
+			outgoingBody = outgoingBody + partBody
+		}
+		return outgoingBody, nil
+	} else if payload.Body.AttachmentId != "" {
+		attachmentUrl, err := writeAttachmentFromPartReturningURL(ctx, srv, messageId, payload, fileCreateMode, dirCreateMode)
+		if err != nil {
+			return "", err
+		}
+		return attachmentUrl + "\r\n\r\n", nil
+	} else {
+		log.Printf("warning: could not parse message part %v", *payload)
+		return "", nil
+	}
+}
+
 
 func writeAttachmentFromPartReturningURL(ctx context.Context, srv *gmail.Service, messageId string, part *gmail.MessagePart, fileCreateMode, dirCreateMode os.FileMode) (string, error) {
 	dir, dirURL, err := attachmentsDirAndURL(messageId, dirCreateMode)
