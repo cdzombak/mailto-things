@@ -15,7 +15,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/microcosm-cc/bluemonday"
+	md "github.com/JohannesKaufmann/html-to-markdown"
 	"google.golang.org/api/gmail/v1"
 )
 
@@ -118,11 +118,13 @@ func Main() error {
 		log.Printf("found %d messages to process", len(messagesToProcess))
 	}
 
-	bmPolicy := bluemonday.NewPolicy()
+	mdConv := md.NewConverter("", true, &md.Options{
+		LinkStyle: "referenced",
+	})
 
 	for _, m := range messagesToProcess {
 		subject := MessageSubject(m)
-		outgoingBody, err := processPayloadReturningOutgoingBody(ctx, srv, bmPolicy, m.Id, m.Payload, fileCreateMode, dirCreateMode)
+		outgoingBody, err := processPayloadReturningOutgoingBody(ctx, srv, mdConv, m.Id, m.Payload, fileCreateMode, dirCreateMode)
 		if err != nil {
 			return err
 		}
@@ -149,7 +151,7 @@ func Main() error {
 	return nil
 }
 
-func processPayloadReturningOutgoingBody(ctx context.Context, srv *gmail.Service, bmPolicy *bluemonday.Policy, messageId string, payload *gmail.MessagePart, fileCreateMode, dirCreateMode os.FileMode) (string, error) {
+func processPayloadReturningOutgoingBody(ctx context.Context, srv *gmail.Service, mdConv *md.Converter, messageId string, payload *gmail.MessagePart, fileCreateMode, dirCreateMode os.FileMode) (string, error) {
 	if payload.MimeType == "text/plain" {
 		bodyBytes, err := base64.URLEncoding.DecodeString(payload.Body.Data)
 		if err != nil {
@@ -161,11 +163,15 @@ func processPayloadReturningOutgoingBody(ctx context.Context, srv *gmail.Service
 		if err != nil {
 			return "", err
 		}
-		return bmPolicy.Sanitize(string(bodyBytes)) + "\r\n\r\n", nil
+		parsed, err := mdConv.ConvertString(string(bodyBytes))
+		if err != nil {
+			return "", err
+		}
+		return parsed + "\r\n\r\n", nil
 	} else if payload.MimeType == "multipart/alternative" || payload.MimeType == "multipart/related" {
 		outgoingBody := ""
 		for _, part := range payload.Parts {
-			partBody, err := processPayloadReturningOutgoingBody(ctx, srv, bmPolicy, messageId, part, fileCreateMode, dirCreateMode)
+			partBody, err := processPayloadReturningOutgoingBody(ctx, srv, mdConv, messageId, part, fileCreateMode, dirCreateMode)
 			if err != nil {
 				return "", err
 			}
@@ -201,9 +207,9 @@ func writeAttachmentFromPartReturningURL(ctx context.Context, srv *gmail.Service
 	attachmentFilename := part.Filename
 	if attachmentFilename == "" {
 		attachmentFilename = messageId
-		exts, err := mime.ExtensionsByType(part.MimeType)
-		if err != nil && exts != nil && len(exts) > 0 {
-			attachmentFilename = attachmentFilename + exts[0]
+		extCandidates, err := mime.ExtensionsByType(part.MimeType)
+		if err != nil && extCandidates != nil && len(extCandidates) > 0 {
+			attachmentFilename = attachmentFilename + extCandidates[0]
 		}
 	}
 	fullFilePath := path.Join(dir, attachmentFilename) // full path to the attachment file on disk
