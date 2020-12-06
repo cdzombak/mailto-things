@@ -166,7 +166,7 @@ func processPayload(ctx context.Context, srv *gmail.Service, mdConv *md.Converte
 			return "", nil, err
 		}
 		return string(bodyBytes), nil, nil
-	} else if payload.MimeType == "text/html" {
+	} else if payload.MimeType == "text/html" || payload.MimeType == "text/watch-html" {
 		bodyBytes, err := base64.URLEncoding.DecodeString(payload.Body.Data)
 		if err != nil {
 			return "", nil, err
