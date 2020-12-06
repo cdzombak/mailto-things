@@ -176,7 +176,7 @@ func processPayload(ctx context.Context, srv *gmail.Service, mdConv *md.Converte
 			return "", nil, err
 		}
 		return parsed + "\r\n\r\n", nil, nil
-	} else if payload.MimeType == "multipart/alternative" || payload.MimeType == "multipart/related" {
+	} else if strings.HasPrefix(payload.MimeType, "multipart/") {
 		outgoingBody := ""
 		cidMap := make(map[string]string)
 		for _, part := range payload.Parts {
