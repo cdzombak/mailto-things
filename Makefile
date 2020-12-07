@@ -44,5 +44,5 @@ install: lint ## Build & install mailto-things to /usr/local/bin
 	go build -ldflags="-X main.version=${VERSION}" -o /usr/local/bin/${BIN_NAME} .
 
 .PHONY: cdzombak-deploy-burr
-deploy-burr: clean build-linux-amd64
+cdzombak-deploy-burr: clean build-linux-amd64
 	scp ./out/linux-amd64/mailto-things burr:~/mailto-things
