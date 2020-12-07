@@ -41,6 +41,7 @@ var (
 	printVersionFlag = flag.Bool("version", false, "Print version and exit.")
 )
 
+// Main implements the mailto-runner application.
 func Main() error {
 	ctx := context.Background()
 	flag.Parse()
@@ -123,9 +124,8 @@ func Main() error {
 	if len(messagesToProcess) == 0 {
 		log.Println("no messages found that require processing")
 		return nil
-	} else {
-		log.Printf("found %d messages to process", len(messagesToProcess))
 	}
+	log.Printf("found %d messages to process", len(messagesToProcess))
 
 	mdConv := md.NewConverter("", true, &md.Options{
 		LinkStyle: "referenced",
@@ -138,8 +138,8 @@ func Main() error {
 			return err
 		}
 
-		for cid, url := range cidMap {
-			outgoingBody = strings.ReplaceAll(outgoingBody, "cid:"+cid, url)
+		for attachmentCID, attachmentURL := range cidMap {
+			outgoingBody = strings.ReplaceAll(outgoingBody, "cid:"+attachmentCID, attachmentURL)
 		}
 
 		var outgoingMessage gmail.Message
@@ -167,7 +167,7 @@ func Main() error {
 }
 
 // processPayload returns the text representing this payload part, and a map of CID -> URL for any attachments processed in the part.
-func processPayload(ctx context.Context, srv *gmail.Service, mdConv *md.Converter, messageId string, payload *gmail.MessagePart, fileCreateMode, dirCreateMode os.FileMode) (string, map[string]string, error) {
+func processPayload(ctx context.Context, srv *gmail.Service, mdConv *md.Converter, messageID string, payload *gmail.MessagePart, fileCreateMode, dirCreateMode os.FileMode) (string, map[string]string, error) {
 	if payload.MimeType == "text/plain" {
 		bodyBytes, err := base64.URLEncoding.DecodeString(payload.Body.Data)
 		if err != nil {
@@ -188,7 +188,7 @@ func processPayload(ctx context.Context, srv *gmail.Service, mdConv *md.Converte
 		outgoingBody := ""
 		cidMap := make(map[string]string)
 		for _, part := range payload.Parts {
-			partBody, partCidMap, err := processPayload(ctx, srv, mdConv, messageId, part, fileCreateMode, dirCreateMode)
+			partBody, partCidMap, err := processPayload(ctx, srv, mdConv, messageID, part, fileCreateMode, dirCreateMode)
 			if err != nil {
 				return "", nil, err
 			}
@@ -199,33 +199,33 @@ func processPayload(ctx context.Context, srv *gmail.Service, mdConv *md.Converte
 		}
 		return outgoingBody, cidMap, nil
 	} else if payload.Body.AttachmentId != "" {
-		attachmentUrl, cid, err := writeAttachmentFromPartReturningURLAndCID(ctx, srv, messageId, payload, fileCreateMode, dirCreateMode)
+		attachmentURL, cid, err := writeAttachmentFromPartReturningURLAndCID(ctx, srv, messageID, payload, fileCreateMode, dirCreateMode)
 		if err != nil {
 			return "", nil, err
 		}
-		return attachmentUrl + "\r\n\r\n", map[string]string{ cid: attachmentUrl }, nil
+		return attachmentURL + "\r\n\r\n", map[string]string{ cid: attachmentURL}, nil
 	} else {
 		log.Printf("warning: could not parse message part %v", *payload)
 		return "", nil, nil
 	}
 }
 
-func writeAttachmentFromPartReturningURLAndCID(ctx context.Context, srv *gmail.Service, messageId string, part *gmail.MessagePart, fileCreateMode, dirCreateMode os.FileMode) (string, string, error) {
-	dir, dirURL, err := attachmentsDirAndURL(messageId, dirCreateMode)
+func writeAttachmentFromPartReturningURLAndCID(ctx context.Context, srv *gmail.Service, messageID string, part *gmail.MessagePart, fileCreateMode, dirCreateMode os.FileMode) (string, string, error) {
+	dir, dirURL, err := attachmentsDirAndURL(messageID, dirCreateMode)
 	if err != nil {
 		return "", "", err
 	}
-	response, err := srv.Users.Messages.Attachments.Get("me", messageId, part.Body.AttachmentId).Context(ctx).Do()
+	response, err := srv.Users.Messages.Attachments.Get("me", messageID, part.Body.AttachmentId).Context(ctx).Do()
 	if err != nil {
-		return "", "", fmt.Errorf("failed to download attachment %s for message %s: %w", part.Body.AttachmentId, messageId, err)
+		return "", "", fmt.Errorf("failed to download attachment %s for message %s: %w", part.Body.AttachmentId, messageID, err)
 	}
 	data, err := base64.URLEncoding.DecodeString(response.Data)
 	if err != nil {
-		return "", "", fmt.Errorf("failed to decode attachment %s for message %s: %w", part.Body.AttachmentId, messageId, err)
+		return "", "", fmt.Errorf("failed to decode attachment %s for message %s: %w", part.Body.AttachmentId, messageID, err)
 	}
 	attachmentFilename := part.Filename
 	if attachmentFilename == "" {
-		attachmentFilename = messageId
+		attachmentFilename = messageID
 		extCandidates, err := mime.ExtensionsByType(part.MimeType)
 		if err != nil && extCandidates != nil && len(extCandidates) > 0 {
 			attachmentFilename = attachmentFilename + extCandidates[0]
@@ -245,7 +245,7 @@ func writeAttachmentFromPartReturningURLAndCID(ctx context.Context, srv *gmail.S
 			i++
 			continue
 		} else if err != nil {
-			return "", "", fmt.Errorf("failed to write attachment %s for message %s to path %s: %w", part.Body.AttachmentId, messageId, fullFilePath, err)
+			return "", "", fmt.Errorf("failed to write attachment %s for message %s to path %s: %w", part.Body.AttachmentId, messageID, fullFilePath, err)
 		} else {
 			writtenAttachmentName = filepath.Base(fullPathToTryWriting)
 			break
@@ -254,13 +254,13 @@ func writeAttachmentFromPartReturningURLAndCID(ctx context.Context, srv *gmail.S
 	return dirURL + "/" + url.PathEscape(writtenAttachmentName), PartCID(part), nil
 }
 
-func attachmentsDirAndURL(messageId string, dirCreateMode os.FileMode) (string, string, error) {
+func attachmentsDirAndURL(messageID string, dirCreateMode os.FileMode) (string, string, error) {
 	dir := MustGetenv(envVarAttachmentsDir)
-	dir = path.Join(dir, messageId)
+	dir = path.Join(dir, messageID)
 	if err := os.MkdirAll(dir, dirCreateMode); err != nil {
 		return "", "", fmt.Errorf("failed to make attachments dir %s: %w", dir, err)
 	}
-	dirURL := MustGetenv(envVarAttachmentsDirURL) + "/" + messageId
+	dirURL := MustGetenv(envVarAttachmentsDirURL) + "/" + messageID
 	return dir, dirURL, nil
 }
 
