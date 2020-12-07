@@ -19,6 +19,8 @@ import (
 	"google.golang.org/api/gmail/v1"
 )
 
+var version = "<dev>"
+
 const (
 	envVarConfigDir            = "MAILTO_THINGS_CONFIG_DIR"
 	envVarIncomingEmail        = "MAILTO_THINGS_INCOMING_EMAIL"
@@ -36,11 +38,17 @@ var (
 	outgoingEmailFlag     = flag.String("outgoingEmail", "", "Things email address to send task emails to. Overrides environment variable MAILTO_THINGS_OUTGOING_EMAIL.")
 	fileCreateModeFlag    = flag.String("fileCreateMode", "0600", "Octal value specifying mode for attachment files written to disk. Must begin with '0' or '0o'.")
 	dirCreateModeFlag     = flag.String("dirCreateMode", "0700", "Octal value specifying mode for attachment directories created on disk. Must begin with '0' or '0o'.")
+	printVersionFlag = flag.Bool("version", false, "Print version and exit.")
 )
 
 func Main() error {
 	ctx := context.Background()
 	flag.Parse()
+
+	if *printVersionFlag {
+		fmt.Println(version)
+		os.Exit(0)
+	}
 
 	if *configDirFlag != "" {
 		_ = os.Setenv(envVarConfigDir, *configDirFlag)
