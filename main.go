@@ -146,7 +146,7 @@ func Main() error {
 		outgoingMessage.Raw = base64.URLEncoding.EncodeToString([]byte(
 			"From: " + MustGetenv(envVarIncomingEmail) + "\r\n" +
 				"To: " + MustGetenv(envVarOutgoingEmail) + "\r\n" +
-				"Subject: " + subject + "\r\n\r\n" + outgoingBody))
+				"Subject: " + mime.QEncoding.Encode("utf-8", subject) + "\r\n\r\n" + outgoingBody))
 		if _, err = srv.Users.Messages.Send("me", &outgoingMessage).Context(ctx).Do(); err != nil {
 			return fmt.Errorf("failed to send message to Things (%s): %w", MustGetenv(envVarOutgoingEmail), err)
 		}
