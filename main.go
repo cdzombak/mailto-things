@@ -38,6 +38,7 @@ var (
 	outgoingEmailFlag     = flag.String("outgoingEmail", "", "Things email address to send task emails to. Overrides environment variable MAILTO_THINGS_OUTGOING_EMAIL.")
 	fileCreateModeFlag    = flag.String("fileCreateMode", "0600", "Octal value specifying mode for attachment files written to disk. Must begin with '0' or '0o'.")
 	dirCreateModeFlag     = flag.String("dirCreateMode", "0700", "Octal value specifying mode for attachment directories created on disk. Must begin with '0' or '0o'.")
+	enableOCR             = flag.Bool("ocr", false, "Enable OCRing incoming images via Tesseract (requires ispell and tesseract in PATH).")
 	printVersionFlag      = flag.Bool("version", false, "Print version and exit.")
 )
 
@@ -199,29 +200,36 @@ func processPayload(ctx context.Context, srv *gmail.Service, mdConv *md.Converte
 		}
 		return outgoingBody, cidMap, nil
 	} else if payload.Body.AttachmentId != "" {
-		attachmentURL, cid, err := writeAttachmentFromPartReturningURLAndCID(ctx, srv, messageID, payload, fileCreateMode, dirCreateMode)
+		attachmentURL, cid, path, err := writeAttachmentFromPartReturningURLAndCIDAndPath(ctx, srv, messageID, payload, fileCreateMode, dirCreateMode)
 		if err != nil {
 			return "", nil, err
 		}
-		return attachmentURL + "\r\n\r\n", map[string]string{cid: attachmentURL}, nil
+		ocrContent := ""
+		if strings.HasPrefix(strings.ToLower(payload.MimeType), "image/") {
+			ocrContent = ocrAttachment(path)
+			if ocrContent != "" {
+				ocrContent = "\r\nAttachment OCR:\r\n" + ocrContent + "\r\n"
+			}
+		}
+		return attachmentURL + ocrContent, map[string]string{cid: attachmentURL}, nil
 	} else {
 		log.Printf("warning: could not parse message part %v", *payload)
 		return "", nil, nil
 	}
 }
 
-func writeAttachmentFromPartReturningURLAndCID(ctx context.Context, srv *gmail.Service, messageID string, part *gmail.MessagePart, fileCreateMode, dirCreateMode os.FileMode) (string, string, error) {
+func writeAttachmentFromPartReturningURLAndCIDAndPath(ctx context.Context, srv *gmail.Service, messageID string, part *gmail.MessagePart, fileCreateMode, dirCreateMode os.FileMode) (string, string, string, error) {
 	dir, dirURL, err := attachmentsDirAndURL(messageID, dirCreateMode)
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
 	response, err := srv.Users.Messages.Attachments.Get("me", messageID, part.Body.AttachmentId).Context(ctx).Do()
 	if err != nil {
-		return "", "", fmt.Errorf("failed to download attachment %s for message %s: %w", part.Body.AttachmentId, messageID, err)
+		return "", "", "", fmt.Errorf("failed to download attachment %s for message %s: %w", part.Body.AttachmentId, messageID, err)
 	}
 	data, err := base64.URLEncoding.DecodeString(response.Data)
 	if err != nil {
-		return "", "", fmt.Errorf("failed to decode attachment %s for message %s: %w", part.Body.AttachmentId, messageID, err)
+		return "", "", "", fmt.Errorf("failed to decode attachment %s for message %s: %w", part.Body.AttachmentId, messageID, err)
 	}
 	attachmentFilename := part.Filename
 	if attachmentFilename == "" {
@@ -245,13 +253,13 @@ func writeAttachmentFromPartReturningURLAndCID(ctx context.Context, srv *gmail.S
 			i++
 			continue
 		} else if err != nil {
-			return "", "", fmt.Errorf("failed to write attachment %s for message %s to path %s: %w", part.Body.AttachmentId, messageID, fullFilePath, err)
+			return "", "", "", fmt.Errorf("failed to write attachment %s for message %s to path %s: %w", part.Body.AttachmentId, messageID, fullFilePath, err)
 		} else {
 			writtenAttachmentName = filepath.Base(fullPathToTryWriting)
 			break
 		}
 	}
-	return dirURL + "/" + url.PathEscape(writtenAttachmentName), PartCID(part), nil
+	return dirURL + "/" + url.PathEscape(writtenAttachmentName), PartCID(part), fullFilePath, nil
 }
 
 func attachmentsDirAndURL(messageID string, dirCreateMode os.FileMode) (string, string, error) {
@@ -262,6 +270,30 @@ func attachmentsDirAndURL(messageID string, dirCreateMode os.FileMode) (string, 
 	}
 	dirURL := MustGetenv(envVarAttachmentsDirURL) + "/" + messageID
 	return dir, dirURL, nil
+}
+
+func ocrAttachment(filename string) string {
+	if !*enableOCR {
+		return ""
+	}
+	retv := ""
+	rawOCR, err := tesseract(filename)
+	if err != nil {
+		log.Printf("error OCRing file '%s': %s", filename, err)
+		return retv
+	}
+	ocrLines := strings.Split(rawOCR, "\n")
+	for _, line := range ocrLines {
+		correctPct, err := spellcheckLine(line)
+		if err != nil {
+			log.Printf("error spellchecking: %s", err)
+			return retv
+		}
+		if correctPct > 0.5 {
+			retv += line + "\r\n"
+		}
+	}
+	return retv
 }
 
 func main() {
