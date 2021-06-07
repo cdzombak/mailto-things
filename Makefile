@@ -31,8 +31,10 @@ build: lint ## Build (for the current platform & architecture) to ./out
 
 .PHONY: build-linux-amd64
 build-linux-amd64: ## Build for Linux/amd64 to ./out
+	chmod +x ./build/zcc
+	chmod +x ./build/zxx
 	mkdir -p out/linux-amd64
-	env GOOS=linux GOARCH=amd64 go build -ldflags="-X main.version=${VERSION}" -o ./out/linux-amd64/${BIN_NAME} .
+	env PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/opt/homebrew/Cellar/leptonica/1.80.0/lib/pkgconfig:/opt/homebrew/Cellar/tesseract/4.1.1/lib/pkgconfig" CGO_ENABLED=1 GOOS=linux GOARCH=amd64 CC="${PWD}/build/zcc" CXX="${PWD}/build/zxx" go build -ldflags="-X main.version=${VERSION}" -o ./out/linux-amd64/${BIN_NAME} .
 
 .PHONY: build-darwin-amd64
 build-darwin-amd64: ## Build for macOS (Darwin) / amd64 to ./out
@@ -46,3 +48,5 @@ install: lint ## Build & install mailto-things to /usr/local/bin
 .PHONY: cdzombak-deploy-burr
 cdzombak-deploy-burr: clean build-linux-amd64
 	scp ./out/linux-amd64/mailto-things burr:~/mailto-things
+
+# deps: install leptonica, tesseract, zig

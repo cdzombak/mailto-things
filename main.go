@@ -16,6 +16,7 @@ import (
 	"strings"
 
 	md "github.com/JohannesKaufmann/html-to-markdown"
+	"github.com/otiai10/gosseract/v2"
 	"google.golang.org/api/gmail/v1"
 )
 
@@ -38,7 +39,8 @@ var (
 	outgoingEmailFlag     = flag.String("outgoingEmail", "", "Things email address to send task emails to. Overrides environment variable MAILTO_THINGS_OUTGOING_EMAIL.")
 	fileCreateModeFlag    = flag.String("fileCreateMode", "0600", "Octal value specifying mode for attachment files written to disk. Must begin with '0' or '0o'.")
 	dirCreateModeFlag     = flag.String("dirCreateMode", "0700", "Octal value specifying mode for attachment directories created on disk. Must begin with '0' or '0o'.")
-	printVersionFlag = flag.Bool("version", false, "Print version and exit.")
+	printVersionFlag      = flag.Bool("version", false, "Print version and exit.")
+	enableOCR             = flag.Bool("ocr", false, "Enable OCRing incoming images via Tesseract.")
 )
 
 // Main implements the mailto-runner application.
@@ -203,7 +205,7 @@ func processPayload(ctx context.Context, srv *gmail.Service, mdConv *md.Converte
 		if err != nil {
 			return "", nil, err
 		}
-		return attachmentURL + "\r\n\r\n", map[string]string{ cid: attachmentURL}, nil
+		return attachmentURL + "\r\n\r\n", map[string]string{cid: attachmentURL}, nil
 	} else {
 		log.Printf("warning: could not parse message part %v", *payload)
 		return "", nil, nil
@@ -251,6 +253,11 @@ func writeAttachmentFromPartReturningURLAndCID(ctx context.Context, srv *gmail.S
 			break
 		}
 	}
+	client := gosseract.NewClient()
+	defer client.Close()
+	client.SetImage(fullFilePath)
+	text, _ := client.Text()
+	fmt.Printf("attachment %s has text: %s", attachmentFilename, text)
 	return dirURL + "/" + url.PathEscape(writtenAttachmentName), PartCID(part), nil
 }
 
