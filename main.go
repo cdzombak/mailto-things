@@ -38,7 +38,7 @@ var (
 	outgoingEmailFlag     = flag.String("outgoingEmail", "", "Things email address to send task emails to. Overrides environment variable MAILTO_THINGS_OUTGOING_EMAIL.")
 	fileCreateModeFlag    = flag.String("fileCreateMode", "0600", "Octal value specifying mode for attachment files written to disk. Must begin with '0' or '0o'.")
 	dirCreateModeFlag     = flag.String("dirCreateMode", "0700", "Octal value specifying mode for attachment directories created on disk. Must begin with '0' or '0o'.")
-	printVersionFlag = flag.Bool("version", false, "Print version and exit.")
+	printVersionFlag      = flag.Bool("version", false, "Print version and exit.")
 )
 
 // Main implements the mailto-runner application.
@@ -203,7 +203,7 @@ func processPayload(ctx context.Context, srv *gmail.Service, mdConv *md.Converte
 		if err != nil {
 			return "", nil, err
 		}
-		return attachmentURL + "\r\n\r\n", map[string]string{ cid: attachmentURL}, nil
+		return attachmentURL + "\r\n\r\n", map[string]string{cid: attachmentURL}, nil
 	} else {
 		log.Printf("warning: could not parse message part %v", *payload)
 		return "", nil, nil
