@@ -8,7 +8,8 @@
 1. Check for incoming emails in a Gmail account
 2. Strip out the attachments from each email and put the files in a directory tree on disk
 3. Replace the attachments in the email by URLs linking to the attachment files
-4. Send the modified email along to Things via [the app's "Mail to Things" feature](https://culturedcode.com/things/support/articles/2908262/)
+4. Extract text from image attachments and include it in the email's body alongside attachment links
+5. Send the modified email along to Things via [the app's "Mail to Things" feature](https://culturedcode.com/things/support/articles/2908262/)
 
 The end result is that you can email files to your specially-configured email address, and the resulting tasks in your Things inbox contain links to those files. This is as close as I can get to actually attaching files directly to things.
 
@@ -43,7 +44,10 @@ The following arguments are not strictly required, but you will almost definitel
 - `-fileCreateMode`: Octal value specifying the [permissions](https://web.archive.org/web/20201207170802/https://www.grymoire.com/Unix/Permissions.html) used to create file attachments on disk. Must begin with `0` or `0o`. Defaults to `0600`.
 - `-dirCreateMode`: Octal value specifying the [permissions](https://web.archive.org/web/20201207170802/https://www.grymoire.com/Unix/Permissions.html) used to create attachment directories on disk. Must begin with `0` or `0o`. Defaults to `0700`.
 
-Additionally, `-version` will print the version number and exit.
+The following arguments are not required:
+
+- `-ocr` will attempt to extract text from image attachments and include it in the task's description. See "OCR," below.
+- `-version` will print the version number and exit.
 
 ### Cron Example
 
@@ -54,6 +58,14 @@ Here's an example of running `mailto-things` periodically via cron, adapted from
 `
 
 This example uses my [`runner` tool](https://github.com/cdzombak/runner) ([introductory blog post](https://www.dzombak.com/blog/2020/12/Introducing-Runner--a-lightweight-wrapper-for-cron-jobs.html)) to avoid emailing me output unless something went wrong.
+
+## OCR
+
+The `-ocr` option will attempt to extract text from image attachments and include the text in the task's description, along with the link to the attachment. This requires the command-line tools `tesseract` and `ispell` to be available in the PATH.
+
+On Ubuntu, these packages are available via `apt install tesseract ispell`.
+
+On macOS, these packages are available via Homebrew: `brew install tesseract ispell`.
 
 ## About
 
