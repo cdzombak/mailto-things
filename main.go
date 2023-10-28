@@ -193,7 +193,7 @@ func processPayload(ctx context.Context, srv *gmail.Service, mdConv *md.Converte
 			if err != nil {
 				return "", nil, err
 			}
-			outgoingBody = outgoingBody + partBody
+			outgoingBody = outgoingBody + partBody + "\r\n"
 			for k, v := range partCidMap {
 				cidMap[k] = v
 			}
@@ -208,7 +208,7 @@ func processPayload(ctx context.Context, srv *gmail.Service, mdConv *md.Converte
 		if strings.HasPrefix(strings.ToLower(payload.MimeType), "image/") {
 			ocrContent = ocrAttachment(path)
 			if ocrContent != "" {
-				ocrContent = "\r\nAttachment OCR:\r\n" + ocrContent + "\r\n"
+				ocrContent = "Attachment OCR:\r\n" + ocrContent + "\r\n"
 			}
 		}
 		return attachmentURL + ocrContent, map[string]string{cid: attachmentURL}, nil
