@@ -67,7 +67,11 @@ On Ubuntu, these packages are available via `apt install tesseract ispell`.
 
 On macOS, these packages are available via Homebrew: `brew install tesseract ispell`.
 
+## License
+
+GNU LGPL v3; see LICENSE in this repository.
+
 ## About
 
 - Issues: https://github.com/cdzombak/mailto-things/issues/new
-- Author: [Chris Dzombak](https://www.dzombak.com)
+- Author: [Chris Dzombak](https://www.dzombak.com) ([GitHub @cdzombak](https://github.com/cdzombak))
