@@ -101,7 +101,7 @@ func Main() error {
 	fileCreateMode = os.FileMode(mode)
 
 	var dirCreateMode os.FileMode
-	mode, err := strconv.ParseInt(*dirCreateModeFlag, 8, 64)
+	mode, err = strconv.ParseInt(*dirCreateModeFlag, 8, 64)
 	if err != nil {
 		flag.PrintDefaults()
 		return errors.New("dirCreateMode must be an octal value parsable by strconv.ParseInt")
@@ -217,10 +217,10 @@ func processPayload(ctx context.Context, srv *gmail.Service, mdConv *md.Converte
 			}
 		}
 		return attachmentURL + ocrContent, map[string]string{cid: attachmentURL}, nil
-	} else {
-		log.Printf("warning: could not parse message part %v", *payload)
-		return "", nil, nil
 	}
+
+	log.Printf("warning: could not parse message part %v", *payload)
+	return "", nil, nil
 }
 
 func writeAttachmentFromPartReturningURLAndCIDAndPath(ctx context.Context, srv *gmail.Service, messageID string, part *gmail.MessagePart, fileCreateMode, dirCreateMode os.FileMode) (string, string, string, error) {
@@ -259,10 +259,10 @@ func writeAttachmentFromPartReturningURLAndCIDAndPath(ctx context.Context, srv *
 			continue
 		} else if err != nil {
 			return "", "", "", fmt.Errorf("failed to write attachment %s for message %s to path %s: %w", part.Body.AttachmentId, messageID, fullFilePath, err)
-		} else {
-			writtenAttachmentName = filepath.Base(fullPathToTryWriting)
-			break
 		}
+
+		writtenAttachmentName = filepath.Base(fullPathToTryWriting)
+		break
 	}
 	return dirURL + "/" + url.PathEscape(writtenAttachmentName), PartCID(part), fullFilePath, nil
 }
