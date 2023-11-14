@@ -1,8 +1,23 @@
+# https://megalinter.io/latest/descriptors/go_golangci_lint/
+# https://github.com/oxsecurity/megalinter/blob/main/TEMPLATES/.golangci.yml
+---
+linters:
+  disable-all: true
+  enable:
+    - gofmt
+    - gocritic
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - typecheck
+    - unused
+
 linters-settings:
   gocritic:
     disabled-checks:
       - exitAfterDefer
-exclude-rules:
-  - linters:
-      - staticcheck
-    text: "SA1019:"
+  staticcheck:
+    checks:
+      - all
+      - '-SA1019'
