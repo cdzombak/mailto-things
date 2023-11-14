@@ -112,7 +112,9 @@ This example uses my [`runner` tool](https://github.com/cdzombak/runner) ([intro
 
 ## Docker
 
-Docker images are available for a variety of Linux architectures from [Docker Hub](https://hub.docker.com/r/cdzombak/mailto-things) and [GHCR](https://github.com/cdzombak/unshorten/pkgs/container/mailto-things). Images are based on the `scratch` image and are as small as possible.
+Docker images are available for a variety of Linux architectures from Docker Hub and GHCR. Images are based on the `scratch` image and are as small as possible.
+
+> TODO(cdzombak): Links.
 
 Run them via, for example:
 
@@ -131,7 +133,7 @@ docker run --rm \
     -outgoingEmail "add-to-things-example@things.email"
 ```
 
-Keep in mind that all paths given as arguments are _within the container,_ including the `GOOGLE_APPLICATION_CREDENTIALS` environment variable, so you'll have to make sure they are all mapped to the desired paths on the host.
+Keep in mind that all paths given as arguments are paths _within the container,_ including the `GOOGLE_APPLICATION_CREDENTIALS` environment variable, so you'll have to make sure they are all mapped to the desired paths on the host.
 
 ## License
 
