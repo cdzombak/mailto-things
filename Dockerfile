@@ -16,7 +16,6 @@ ARG BIN_NAME
 COPY --from=builder /src/out/${BIN_NAME} /usr/bin/${BIN_NAME}
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 ENTRYPOINT ["/usr/bin/mailto-things"]
-CMD ["-config", "/config.json"]
 
 LABEL license="LGPL-3.0"
 LABEL org.opencontainers.image.licenses="LGPL-3.0"
