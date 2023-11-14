@@ -18,8 +18,8 @@ COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 ENTRYPOINT ["/usr/bin/mailto-things"]
 CMD ["-config", "/config.json"]
 
-LABEL license="LGPL-3"
-LABEL org.opencontainers.image.licenses="LGPL-3"
+LABEL license="LGPL-3.0"
+LABEL org.opencontainers.image.licenses="LGPL-3.0"
 LABEL maintainer="Chris Dzombak <https://www.dzombak.com>"
 LABEL org.opencontainers.image.authors="Chris Dzombak <https://www.dzombak.com>"
 LABEL org.opencontainers.image.url="https://github.com/cdzombak/mailto-things"

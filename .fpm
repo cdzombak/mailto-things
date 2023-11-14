@@ -3,4 +3,4 @@
 --description "Allow sending emails to Things.app with attachments (kind of)"
 --url "https://github.com/cdzombak/mailto-things"
 --maintainer "Chris Dzombak <https://www.dzombak.com>"
---license MIT
+--license LGPL-3.0
