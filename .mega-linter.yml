@@ -15,6 +15,7 @@ DISABLE_LINTERS:
 PLUGINS:
   - https://raw.githubusercontent.com/cdzombak/mega-linter-plugin-dockerfilelint/main/mega-linter-plugin-dockerfilelint/dockerfilelint.megalinter-descriptor.yml
 
+GO_GOLANGCI_LINT_ARGUMENTS: --timeout=10m
 GO_REVIVE_CONFIG_FILE: ".revive.toml"
 
 SHOW_ELAPSED_TIME: false
