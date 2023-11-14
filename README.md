@@ -60,10 +60,10 @@ You will need to create a Google Cloud Platform project with access to the Gmail
 
 ### OCR Setup
 
-The `-ocr` option will attempt to extract text from image attachments and include the text in the task's description (along with the link to the attachment). This requires a Google Cloud project set up, with billing and the Vision API enabled, and a local file with Google service account credentials.
+The `-ocr` option will attempt to extract text from image attachments and include the text in the task's description (along with the link to the attachment). This requires a Google Cloud project with billing and the Vision API enabled, and a local file with Google service account credentials.
 
-- See [the image label detection guide](https://cloud.google.com/vision/docs/detect-labels-image-client-libraries) for details on Cloud Vision API setup
-- See [the application default credentials docs](https://cloud.google.com/docs/authentication/application-default-credentials) for details on credentials setup
+- See [the image label detection guide](https://cloud.google.com/vision/docs/detect-labels-image-client-libraries) for details on Cloud Vision API setup.
+- See [the application default credentials docs](https://cloud.google.com/docs/authentication/application-default-credentials) for details on credentials setup.
 - Create a service account at [Service Accounts in the GCP Console](https://console.cloud.google.com/iam-admin/serviceaccounts). Only the `roles/storage.objectViewer` role is needed.
 - Create and download a JSON key for the service account from the GCP Console.
 - Give the path to the service account JSON key as the `GOOGLE_APPLICATION_CREDENTIALS` environment variable.
