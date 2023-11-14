@@ -15,6 +15,7 @@ import (
 	"strconv"
 	"strings"
 
+	vision "cloud.google.com/go/vision/apiv1"
 	md "github.com/JohannesKaufmann/html-to-markdown"
 	"google.golang.org/api/gmail/v1"
 )
@@ -28,6 +29,8 @@ const (
 	envVarAttachmentsDir       = "MAILTO_THINGS_ATTACHMENTS_DIR"
 	envVarAttachmentsDirURL    = "MAILTO_THINGS_ATTACHMENTS_DIR_URL"
 	envVarDontTouchOrigMessage = "MAILTO_THINGS_DONT_TOUCH_ORIG_MESSAGE"
+
+	envVarGoogleAppCredentials = "GOOGLE_APPLICATION_CREDENTIALS"
 )
 
 var (
@@ -39,7 +42,7 @@ var (
 	fileCreateModeFlag    = flag.String("fileCreateMode", "0600", "Octal value specifying mode for attachment files written to disk. Must begin with '0' or '0o'.")
 	dirCreateModeFlag     = flag.String("dirCreateMode", "0700", "Octal value specifying mode for attachment directories created on disk. Must begin with '0' or '0o'.")
 	dontTouchOrigMessage  = flag.Bool("dontTouchOrigMessage", false, "If given, the original message will not be marked as read or trashed. Overrides environment variable MAILTO_THINGS_DONT_TOUCH_ORIG_MESSAGE.")
-	enableOCR             = flag.Bool("ocr", false, "Enable OCRing incoming images via Tesseract (requires ispell and tesseract in PATH).")
+	enableOCR             = flag.Bool("ocr", false, "Enable OCRing incoming images via the Google Cloud Vision API.")
 	printVersionFlag      = flag.Bool("version", false, "Print version and exit.")
 )
 
@@ -113,6 +116,17 @@ func Main() error {
 		return err
 	}
 
+	var gVision *vision.ImageAnnotatorClient
+	if *enableOCR {
+		if os.Getenv("GOOGLE_APPLICATION_CREDENTIALS") == "" {
+			return fmt.Errorf("argument -ocr requires environment variable %s to be set; see https://cloud.google.com/docs/authentication/application-default-credentials", envVarGoogleAppCredentials)
+		}
+		gVision, err = vision.NewImageAnnotatorClient(ctx)
+		if err != nil {
+			return fmt.Errorf("failed to create Google Vision client for attachment OCR: %w", err)
+		}
+	}
+
 	var messagesToProcess []*gmail.Message
 	searchQuery := fmt.Sprintf("to:\"%s\" is:unread", MustGetenv(envVarIncomingEmail))
 	if err = srv.Users.Messages.List("me").IncludeSpamTrash(false).Q(searchQuery).Context(ctx).Pages(ctx, func(response *gmail.ListMessagesResponse) error {
@@ -139,7 +153,7 @@ func Main() error {
 
 	for _, m := range messagesToProcess {
 		subject := MessageSubject(m)
-		outgoingBody, cidMap, err := processPayload(ctx, srv, mdConv, m.Id, m.Payload, fileCreateMode, dirCreateMode)
+		outgoingBody, cidMap, err := processPayload(ctx, srv, mdConv, m.Id, m.Payload, fileCreateMode, dirCreateMode, gVision)
 		if err != nil {
 			return err
 		}
@@ -173,7 +187,7 @@ func Main() error {
 }
 
 // processPayload returns the text representing this payload part, and a map of CID -> URL for any attachments processed in the part.
-func processPayload(ctx context.Context, srv *gmail.Service, mdConv *md.Converter, messageID string, payload *gmail.MessagePart, fileCreateMode, dirCreateMode os.FileMode) (string, map[string]string, error) {
+func processPayload(ctx context.Context, srv *gmail.Service, mdConv *md.Converter, messageID string, payload *gmail.MessagePart, fileCreateMode, dirCreateMode os.FileMode, gVision *vision.ImageAnnotatorClient) (string, map[string]string, error) {
 	if payload.MimeType == "text/plain" {
 		bodyBytes, err := base64.URLEncoding.DecodeString(payload.Body.Data)
 		if err != nil {
@@ -194,26 +208,28 @@ func processPayload(ctx context.Context, srv *gmail.Service, mdConv *md.Converte
 		outgoingBody := ""
 		cidMap := make(map[string]string)
 		for _, part := range payload.Parts {
-			partBody, partCidMap, err := processPayload(ctx, srv, mdConv, messageID, part, fileCreateMode, dirCreateMode)
+			partBody, partCidMap, err := processPayload(ctx, srv, mdConv, messageID, part, fileCreateMode, dirCreateMode, gVision)
 			if err != nil {
 				return "", nil, err
 			}
-			outgoingBody = outgoingBody + partBody + "\r\n"
+			outgoingBody = outgoingBody + partBody
 			for k, v := range partCidMap {
 				cidMap[k] = v
 			}
 		}
 		return outgoingBody, cidMap, nil
 	} else if payload.Body.AttachmentId != "" {
-		attachmentURL, cid, path, err := writeAttachmentFromPartReturningURLAndCIDAndPath(ctx, srv, messageID, payload, fileCreateMode, dirCreateMode)
+		attachmentURL, cid, attachmentPath, err := writeAttachmentFromPartReturningURLAndCIDAndPath(ctx, srv, messageID, payload, fileCreateMode, dirCreateMode)
 		if err != nil {
 			return "", nil, err
 		}
 		ocrContent := ""
 		if strings.HasPrefix(strings.ToLower(payload.MimeType), "image/") {
-			ocrContent = ocrAttachment(path)
-			if ocrContent != "" {
-				ocrContent = "Attachment OCR:\r\n" + ocrContent + "\r\n"
+			ocrContent, err = ocrAttachment(attachmentPath, gVision)
+			if err != nil {
+				log.Printf("failed to OCR attachment %s: %v", attachmentPath, err)
+			} else if ocrContent != "" {
+				ocrContent = "\r\n_Attachment OCR:_\r\n" + ocrContent + "\r\n"
 			}
 		}
 		return attachmentURL + ocrContent, map[string]string{cid: attachmentURL}, nil
@@ -277,28 +293,32 @@ func attachmentsDirAndURL(messageID string, dirCreateMode os.FileMode) (string, 
 	return dir, dirURL, nil
 }
 
-func ocrAttachment(filename string) string {
-	if !*enableOCR {
-		return ""
+func ocrAttachment(filename string, gVision *vision.ImageAnnotatorClient) (string, error) {
+	if !*enableOCR || gVision == nil {
+		return "", nil
 	}
-	retv := ""
-	rawOCR, err := tesseract(filename)
+
+	f, err := os.Open(filename)
 	if err != nil {
-		log.Printf("error OCRing file '%s': %s", filename, err)
-		return retv
+		return "", err
 	}
-	ocrLines := strings.Split(rawOCR, "\n")
-	for _, line := range ocrLines {
-		correctPct, err := spellcheckLine(line)
-		if err != nil {
-			log.Printf("error spellchecking: %s", err)
-			return retv
-		}
-		if correctPct > 0.5 {
-			retv += line + "\r\n"
-		}
+	defer f.Close()
+
+	image, err := vision.NewImageFromReader(f)
+	if err != nil {
+		return "", err
 	}
-	return retv
+
+	annotations, err := gVision.DetectTexts(context.Background(), image, nil, 1)
+	if err != nil {
+		return "", err
+	}
+
+	if len(annotations) == 0 {
+		return "", nil
+	}
+
+	return fmt.Sprintf("%s\r\n", strings.ReplaceAll(annotations[0].Description, "\n", " ")), nil
 }
 
 func main() {
