@@ -212,7 +212,7 @@ func processPayload(ctx context.Context, srv *gmail.Service, mdConv *md.Converte
 			if err != nil {
 				return "", nil, err
 			}
-			outgoingBody = outgoingBody + partBody
+			outgoingBody += partBody
 			for k, v := range partCidMap {
 				cidMap[k] = v
 			}
@@ -257,7 +257,7 @@ func writeAttachmentFromPartReturningURLAndCIDAndPath(ctx context.Context, srv *
 		attachmentFilename = messageID
 		extCandidates, err := mime.ExtensionsByType(part.MimeType)
 		if err != nil && extCandidates != nil && len(extCandidates) > 0 {
-			attachmentFilename = attachmentFilename + extCandidates[0]
+			attachmentFilename += extCandidates[0]
 		}
 	}
 	fullFilePath := path.Join(dir, attachmentFilename) // full path to the attachment file on disk

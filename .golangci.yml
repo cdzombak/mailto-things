@@ -5,7 +5,6 @@ linters:
   disable-all: true
   enable:
     - gofmt
-    - gocritic
     - gosimple
     - govet
     - ineffassign
@@ -20,4 +19,4 @@ linters-settings:
   staticcheck:
     checks:
       - all
-      - '-SA1019'
+      - "-SA1019"
