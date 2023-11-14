@@ -93,20 +93,20 @@ func Main() error {
 	}
 
 	var fileCreateMode os.FileMode
-	if mode, err := strconv.ParseInt(*fileCreateModeFlag, 8, 64); err != nil {
+	mode, err := strconv.ParseInt(*fileCreateModeFlag, 8, 64)
+	if err != nil {
 		flag.PrintDefaults()
 		return errors.New("fileCreateMode must be an octal value parsable by strconv.ParseInt")
-	} else {
-		fileCreateMode = os.FileMode(mode)
 	}
+	fileCreateMode = os.FileMode(mode)
 
 	var dirCreateMode os.FileMode
-	if mode, err := strconv.ParseInt(*dirCreateModeFlag, 8, 64); err != nil {
+	mode, err := strconv.ParseInt(*dirCreateModeFlag, 8, 64)
+	if err != nil {
 		flag.PrintDefaults()
 		return errors.New("dirCreateMode must be an octal value parsable by strconv.ParseInt")
-	} else {
-		dirCreateMode = os.FileMode(mode)
 	}
+	dirCreateMode = os.FileMode(mode)
 
 	srv, err := buildGmailService(ctx)
 	if err != nil {
@@ -117,11 +117,11 @@ func Main() error {
 	searchQuery := fmt.Sprintf("to:\"%s\" is:unread", MustGetenv(envVarIncomingEmail))
 	if err = srv.Users.Messages.List("me").IncludeSpamTrash(false).Q(searchQuery).Context(ctx).Pages(ctx, func(response *gmail.ListMessagesResponse) error {
 		for _, mStub := range response.Messages {
-			if m, err := srv.Users.Messages.Get("me", mStub.Id).Context(ctx).Do(); err != nil {
+			m, err := srv.Users.Messages.Get("me", mStub.Id).Context(ctx).Do()
+			if err != nil {
 				return fmt.Errorf("error fetching message %s: %w", mStub.Id, err)
-			} else {
-				messagesToProcess = append(messagesToProcess, m)
 			}
+			messagesToProcess = append(messagesToProcess, m)
 		}
 		return nil
 	}); err != nil {

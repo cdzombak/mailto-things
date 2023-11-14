@@ -56,10 +56,10 @@ The following arguments are not required:
 Here's an example of running `mailto-things` periodically via cron, adapted from my own usage:
 
 `
-*/5		*	*	*	*	runner -print-if-match "could not parse message part" -work-dir /home/cdzombak/mailto-things -- ./mailto-things -configDir /home/cdzombak/mailto-things -attachmentsDir /home/cdzombak/Sync/public/mailto-things -attachmentsDirURL "https://dropbox.dzombak.com/mailto-things" -fileCreateMode 0644 -dirCreateMode 0755 -incomingEmail "example+mailtothings@gmail.com" -outgoingEmail "add-to-things-example@things.email"
+*/5  *  *  *  *  runner -print-if-match "could not parse message part" -work-dir /home/cdzombak/mailto-things -- ./mailto-things -configDir /home/cdzombak/mailto-things -attachmentsDir /home/cdzombak/Sync/public/mailto-things -attachmentsDirURL "https://dropbox.dzombak.com/mailto-things" -fileCreateMode 0644 -dirCreateMode 0755 -incomingEmail "example+mailtothings@gmail.com" -outgoingEmail "add-to-things-example@things.email"
 `
 
-This example uses my [`runner` tool](https://github.com/cdzombak/runner) ([introductory blog post](https://www.dzombak.com/blog/2020/12/Introducing-Runner--a-lightweight-wrapper-for-cron-jobs.html)) to avoid emailing me output unless something went wrong.
+This example uses my [`runner` tool](https://github.com/cdzombak/runner) ([introductory blog post](https://www.dzombak.com/blog/2020/12/Introducing-Runner-a-lightweight-wrapper-for-cron-jobs.html)) to avoid emailing me output unless something went wrong.
 
 ## OCR
 
@@ -75,5 +75,5 @@ GNU LGPL v3; see LICENSE in this repository.
 
 ## About
 
-- Issues: https://github.com/cdzombak/mailto-things/issues/new
+- Issues: [github.com/cdzombak/mailto-things/issues](https://github.com/cdzombak/mailto-things/issues)
 - Author: [Chris Dzombak](https://www.dzombak.com) ([GitHub @cdzombak](https://github.com/cdzombak))
