@@ -13,23 +13,72 @@
 
 The end result is that you can email files to your specially-configured email address, and the resulting tasks in your Things inbox contain links to those files. This is as close as I can get to actually attaching files directly to things.
 
-## Installation
+## Installation & Setup
 
-To install the binary on your server, clone this repository and run `make install`. If you prefer to build the program elsewhere, the Makefile provides some targets for cross-compilation, eg. `make build-linux-amd64`. Run `make help` for a list of targets. The build products are placed in `./out`; just copy the `mailto-things` binary to wherever you want to run it.
+### macOS via Homebrew
 
-### Web Hosting
+```shell
+brew install cdzombak/oss/mailto-things
+```
 
-Attachment files must be written to a web-accessible directory. This is beyond the scope of this README, but basically you just need a writable folder which the web server can read & serve from. I strongly recommend disabling directory listing on that folder!
+### Debian via apt repository
 
-I'm placing attachment files in my [public "Dropbox" folder](https://www.dzombak.com/blog/2014/01/serving-dropbox-via-nginx.html), though I now use [Syncthing](https://syncthing.net) instead of Dropbox for sharing stuff between my computers & servers. This means that, in addition to my attachment files being web-accessible, they're synchronized locally to my computers for offline use.
+Install my Debian repository if you haven't already:
+
+```shell
+sudo apt-get install ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://dist.cdzombak.net/deb.key | sudo gpg --dearmor -o /etc/apt/keyrings/dist-cdzombak-net.gpg
+sudo chmod 0644 /etc/apt/keyrings/dist-cdzombak-net.gpg
+echo -e "deb [signed-by=/etc/apt/keyrings/dist-cdzombak-net.gpg] https://dist.cdzombak.net/deb/oss any oss\n" | sudo tee -a /etc/apt/sources.list.d/dist-cdzombak-net.list > /dev/null
+sudo apt-get update
+```
+
+Then install `mailto-things` via `apt-get`:
+
+```shell
+sudo apt-get install mailto-things
+```
+
+### Manual installation from build artifacts
+
+Pre-built binaries for Linux and macOS on various architectures are downloadable from each [GitHub Release](https://github.com/cdzombak/mailto-things/releases). Debian packages for each release are available as well.
+
+### Build and install locally
+
+```shell
+git clone https://github.com/cdzombak/mailto-things.git
+cd mailto-things
+make build
+
+cp out/mailto-things $INSTALL_DIR
+```
 
 ### Gmail App Credentials
 
 You will need to create a Google Cloud Platform project with access to the Gmail API. The easiest way to do that is Step 1 on Google's [Gmail API Go Quickstart](https://developers.google.com/gmail/api/quickstart/go) documentation page. Download the resulting `credentials.json` file and store it in a private `mailto-things` configuration directory on the server you'll use to run this program.
 
-## Usage & Configuration
+### OCR Setup
 
-Note that the first time you run the program you'll have to authorize its access to your Gmail account. Therefore, test your configuration by running `mailto-things` in an interactive shell before setting up a cronjob.
+The `-ocr` option will attempt to extract text from image attachments and include the text in the task's description (along with the link to the attachment). This requires a Google Cloud project set up, with billing and the Vision API enabled, and a local file with Google service account credentials.
+
+- See [the image label detection guide](https://cloud.google.com/vision/docs/detect-labels-image-client-libraries) for details on Cloud Vision API setup
+- See [the application default credentials docs](https://cloud.google.com/docs/authentication/application-default-credentials) for details on credentials setup
+- Create a service account at [Service Accounts in the GCP Console](https://console.cloud.google.com/iam-admin/serviceaccounts). Only the `roles/storage.objectViewer` role is needed.
+- Create and download a JSON key for the service account from the GCP Console.
+- Give the path to the service account JSON key as the `GOOGLE_APPLICATION_CREDENTIALS` environment variable.
+
+Note that using OCR is optional.
+
+### Web Hosting
+
+Attachment files must be written to a web-accessible directory. This is beyond the scope of this README, but basically you just need a writable folder which the web server can read & serve from. (I strongly recommend disabling directory listing on that folder!)
+
+I place attachment files in a special directory on my home NAS server, and I make them accessible on my Tailscale network using [`tailscale serve`](https://tailscale.com/kb/1242/tailscale-serve/). I also use [Syncthing](https://syncthing.net) to sync the folder to my laptops; this means that, in addition to my attachment files being accessible anywhere on the Tailnet, they're synchronized locally for offline use.
+
+## Usage
+
+The first time you run the program you'll have to authorize its access to your Gmail account. Therefore, test your configuration by running `mailto-things` in an interactive shell before setting up a cronjob.
 
 The following arguments (or their equivalent environment variables) are required:
 
@@ -46,7 +95,7 @@ The following arguments are not strictly required, but you will almost definitel
 
 The following arguments are not required:
 
-- `-dontTouchOrigMessage`: If given, the original message will not be marked as read or trashed. (Overrides environment variable `MAILTO_THINGS_DONT_TOUCH_ORIG_MESSAGE`.)
+- `-dontTouchOrigMessage`: If given, the original message will not be marked as read or trashed. (Overrides environment variable `MAILTO_THINGS_DONT_TOUCH_ORIG_MESSAGE`.) This is particularly useful when testing your setup.
 - `-ocr` will attempt to extract text from image attachments and include it in the task's description. See "OCR," below.
 - `-help` will print help and exit.
 - `-version` will print the version number and exit.
@@ -56,18 +105,33 @@ The following arguments are not required:
 Here's an example of running `mailto-things` periodically via cron, adapted from my own usage:
 
 `
-*/5  *  *  *  *  runner -print-if-match "could not parse message part" -work-dir /home/cdzombak/mailto-things -- ./mailto-things -configDir /home/cdzombak/mailto-things -attachmentsDir /home/cdzombak/Sync/public/mailto-things -attachmentsDirURL "https://dropbox.dzombak.com/mailto-things" -fileCreateMode 0644 -dirCreateMode 0755 -incomingEmail "example+mailtothings@gmail.com" -outgoingEmail "add-to-things-example@things.email"
+*/5  *  *  *  *  runner -print-if-match "could not parse message part" -work-dir /home/cdzombak/mailto-things -- ./mailto-things -configDir /home/cdzombak/mailto-things/config -attachmentsDir /home/cdzombak/mailto-things/attachments -attachmentsDirURL "https://dropbox.dzombak.com/mailto-things" -fileCreateMode 0644 -dirCreateMode 0755 -incomingEmail "example+mailtothings@gmail.com" -outgoingEmail "add-to-things-example@things.email"
 `
 
 This example uses my [`runner` tool](https://github.com/cdzombak/runner) ([introductory blog post](https://www.dzombak.com/blog/2020/12/Introducing-Runner-a-lightweight-wrapper-for-cron-jobs.html)) to avoid emailing me output unless something went wrong.
 
-## OCR
+## Docker
 
-The `-ocr` option will attempt to extract text from image attachments and include the text in the task's description, along with the link to the attachment. This requires the command-line tools `tesseract` and `ispell` to be available in the PATH.
+Docker images are available for a variety of Linux architectures from [Docker Hub](https://hub.docker.com/r/cdzombak/mailto-things) and [GHCR](https://github.com/cdzombak/unshorten/pkgs/container/mailto-things). Images are based on the `scratch` image and are as small as possible.
 
-On Ubuntu, these packages are available via `apt install tesseract ispell`.
+Run them via, for example:
 
-On macOS, these packages are available via Homebrew: `brew install tesseract ispell`.
+```shell
+docker run --rm \
+    -v /home/cdzombak/mailto-things/config:/app-config \
+    -v /home/cdzombak/mailto-things/attachments:/app-attachments \
+    -e GOOGLE_APPLICATION_CREDENTIALS=/app-config/google-sa-credentials.json \
+    cdzombak/mailto-things:1 \
+    -configDir /app-config \
+    -attachmentsDir /app-attachments \
+    -attachmentsDirURL "https://example.tailnet-1234.ts.net" \
+    -fileCreateMode 0644 \
+    -dirCreateMode 0755 \
+    -incomingEmail "example+mailtothings@gmail.com" \
+    -outgoingEmail "add-to-things-example@things.email"
+```
+
+Keep in mind that all paths given as arguments are _within the container,_ including the `GOOGLE_APPLICATION_CREDENTIALS` environment variable, so you'll have to make sure they are all mapped to the desired paths on the host.
 
 ## License
 
