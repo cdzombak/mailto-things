@@ -1,5 +1,7 @@
 .idea/
 out/
+credentials.json
+token.json
 
 # Created by .ignore support plugin (hsz.mobi)
 ### Go template
@@ -18,4 +20,3 @@ out/
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
-
