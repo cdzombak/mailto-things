@@ -38,6 +38,7 @@ var (
 	outgoingEmailFlag     = flag.String("outgoingEmail", "", "Things email address to send task emails to. Overrides environment variable MAILTO_THINGS_OUTGOING_EMAIL.")
 	fileCreateModeFlag    = flag.String("fileCreateMode", "0600", "Octal value specifying mode for attachment files written to disk. Must begin with '0' or '0o'.")
 	dirCreateModeFlag     = flag.String("dirCreateMode", "0700", "Octal value specifying mode for attachment directories created on disk. Must begin with '0' or '0o'.")
+	dontTouchOrigMessage  = flag.Bool("dontTouchOrigMessage", false, "If given, the original message will not be marked as read or trashed. Overrides environment variable MAILTO_THINGS_DONT_TOUCH_ORIG_MESSAGE.")
 	enableOCR             = flag.Bool("ocr", false, "Enable OCRing incoming images via Tesseract (requires ispell and tesseract in PATH).")
 	printVersionFlag      = flag.Bool("version", false, "Print version and exit.")
 )
@@ -85,6 +86,10 @@ func Main() error {
 	} else if os.Getenv(envVarOutgoingEmail) == "" {
 		flag.PrintDefaults()
 		return fmt.Errorf("argument 'outgoingEmail' is required (if not using environment variable %s)", envVarOutgoingEmail)
+	}
+
+	if *dontTouchOrigMessage {
+		_ = os.Setenv(envVarDontTouchOrigMessage, "true")
 	}
 
 	var fileCreateMode os.FileMode

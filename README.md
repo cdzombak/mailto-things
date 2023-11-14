@@ -31,7 +31,7 @@ You will need to create a Google Cloud Platform project with access to the Gmail
 
 Note that the first time you run the program you'll have to authorize its access to your Gmail account. Therefore, test your configuration by running `mailto-things` in an interactive shell before setting up a cronjob.
 
-All of the following arguments (or their equivalent environment variables) are required:
+The following arguments (or their equivalent environment variables) are required:
 
 - `-configDir`: Path to the directory where `credentials.json` & user authorization tokens are stored. (Overrides environment variable `MAILTO_THINGS_CONFIG_DIR`.)
 - `-attachmentsDir`: Path to the directory on disk where attachments are stored. (Overrides environment variable `MAILTO_THINGS_ATTACHMENTS_DIR`.)
@@ -46,7 +46,9 @@ The following arguments are not strictly required, but you will almost definitel
 
 The following arguments are not required:
 
+- `-dontTouchOrigMessage`: If given, the original message will not be marked as read or trashed. (Overrides environment variable `MAILTO_THINGS_DONT_TOUCH_ORIG_MESSAGE`.)
 - `-ocr` will attempt to extract text from image attachments and include it in the task's description. See "OCR," below.
+- `-help` will print help and exit.
 - `-version` will print the version number and exit.
 
 ### Cron Example
