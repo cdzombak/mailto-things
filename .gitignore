@@ -3,6 +3,13 @@ out/
 credentials.json
 token.json
 
+# MegaLinter artifacts
+megalinter-reports/
+mega-linter.log
+
+# Build artifacts
+mailto-things
+
 # Created by .ignore support plugin (hsz.mobi)
 ### Go template
 # Binaries for programs and plugins
