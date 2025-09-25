@@ -1,0 +1,9 @@
+Results of golangci-lint linter (version 2.1.6)
+See documentation on https://megalinter.io/8.8.0/descriptors/go_golangci_lint/
+-----------------------------------------------
+
+❌ [ERROR] for workspace /tmp/lint
+Linter raw log:
+Error: can't load config: unsupported version of the configuration: "" See https://golangci-lint.run/product/migration-guide for migration instructions
+Failed executing command with error: can't load config: unsupported version of the configuration: "" See https://golangci-lint.run/product/migration-guide for migration instructions
+

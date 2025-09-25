@@ -1,0 +1,5 @@
+Results of checkov linter (version 3.2.413)
+See documentation on https://megalinter.io/8.8.0/descriptors/repository_checkov/
+-----------------------------------------------
+
+✅ [SUCCESS] for workspace /tmp/lint

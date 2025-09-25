@@ -1,0 +1,5 @@
+Results of bash-exec linter (version 5.2.37)
+See documentation on https://megalinter.io/8.8.0/descriptors/bash_bash_exec/
+-----------------------------------------------
+
+✅ [SUCCESS] .version.sh

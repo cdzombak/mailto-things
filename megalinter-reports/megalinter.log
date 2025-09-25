@@ -1,0 +1,273 @@
+----------------------------------------------------------------------------------------------------
+------------------------------------ MegaLinter, by OX Security ------------------------------------
+----------------------------------------------------------------------------------------------------
+ - Image Creation Date: 2025-06-15T16:22:42Z
+ - Image Revision: e08c2b05e3dbc40af4c23f41172ef1e068a7d651
+ - Image Version: v8.8.0
+----------------------------------------------------------------------------------------------------
+The MegaLinter documentation can be found at:
+ - https://megalinter.io/8.8.0
+----------------------------------------------------------------------------------------------------
+MegaLinter initialization
+MegaLinter will analyze workspace [/tmp/lint]
+
+[Plugins] Loaded plugin descriptor /megalinter-descriptors/dockerfilelint.megalinter-descriptor.yml from https://raw.githubusercontent.com/cdzombak/mega-linter-plugin-dockerfilelint/main/mega-linter-plugin-dockerfilelint/dockerfilelint.megalinter-descriptor.yml
+[Plugins] Successful initialization of DOCKERFILELINT plugins
+[Activation] ANSIBLE_ANSIBLE_LINT has been set inactive, as none of these files has been found: ['.ansible-lint', '.ansible-lint.yml', '.ansible-lint.yaml', '.config/ansible-lint.yml', '.config/ansible-lint.yaml']
+[Activation] EDITORCONFIG_EDITORCONFIG_CHECKER has been set inactive, as none of these files has been found: ['.editorconfig']
+[Activation] JAVASCRIPT_ES has been set inactive, as none of these files has been found: ['.eslintrc.json', '.eslintrc.yml', '.eslintrc.yaml', '.eslintrc.js', '.eslintrc.cjs', 'package.json:eslintConfig']
+[Activation] JSON_NPM_PACKAGE_JSON_LINT has been set inactive, as none of these files has been found: ['package.json']
+[Activation] JSX_ESLINT has been set inactive, as none of these files has been found: ['eslint.config.js', 'eslint.config.mjs', 'eslint.config.cjs', '.eslintrc.json', '.eslintrc.yml', '.eslintrc.yaml', '.eslintrc.js', '.eslintrc.cjs', 'package.json:eslintConfig']
+[Activation] KUBERNETES_KUBECONFORM has been set inactive, as subdirectory has not been found: kubernetes (set value "any" to always activate)
+[Activation] KUBERNETES_HELM has been set inactive, as none of these files has been found: ['Chart.yml', 'Chart.yaml']
+[Activation] KUBERNETES_KUBESCAPE has been set inactive, as none of these files has been found: ['Chart.yml', 'Chart.yaml']
+[Activation] REPOSITORY_LS_LINT has been set inactive, as none of these files has been found: ['.ls-lint.yml']
+[SemgrepLinter] Deactivated because no ruleset has been defined
+[Activation] SALESFORCE_SFDX_SCANNER_APEX has been set inactive, as subdirectory has not been found: force-app (set value "any" to always activate)
+[Activation] SALESFORCE_SFDX_SCANNER_AURA has been set inactive, as subdirectory has not been found: force-app (set value "any" to always activate)
+[Activation] SALESFORCE_SFDX_SCANNER_LWC has been set inactive, as subdirectory has not been found: force-app (set value "any" to always activate)
+[Activation] SALESFORCE_LIGHTNING_FLOW_SCANNER has been set inactive, as subdirectory has not been found: force-app (set value "any" to always activate)
+[Activation] SQL_SQLFLUFF has been set inactive, as none of these files has been found: ['.sqlfluff']
+[Activation] SWIFT_SWIFTLINT has been set inactive, as none of these files has been found: ['.swiftlint.yml']
+[Activation] TSX_ESLINT has been set inactive, as none of these files has been found: ['.eslintrc.json', '.eslintrc.yml', '.eslintrc.yaml', '.eslintrc.js', '.eslintrc.cjs', 'package.json:eslintConfig']
+[Activation] TYPESCRIPT_ES has been set inactive, as none of these files has been found: ['.eslintrc.json', '.eslintrc.yml', '.eslintrc.yaml', '.eslintrc.js', '.eslintrc.cjs', 'package.json:eslintConfig']
+JSON_ESLINT_PLUGIN_JSONC has been disabled in MegaLinter for the following reason: Bug in eslint-plugin-jsonc: https://github.com/ota-meshi/eslint-plugin-jsonc/issues/328
+MAKEFILE_CHECKMAKE has been disabled in MegaLinter for the following reason: Security issues: https://github.com/mrtazz/checkmake/issues/99
+MARKDOWN_REMARK_LINT has been disabled in MegaLinter for the following reason: Bug in remark-lint: https://github.com/remarkjs/remark-lint/issues/322
+Skipped linters: ANSIBLE_ANSIBLE_LINT, COPYPASTE_JSCPD, DOCKERFILE_HADOLINT, EDITORCONFIG_EDITORCONFIG_CHECKER, GO_GOLANGCI_LINT, JAVASCRIPT_ES, JAVASCRIPT_PRETTIER, JSON_ESLINT_PLUGIN_JSONC, JSON_NPM_PACKAGE_JSON_LINT, JSX_ESLINT, KUBERNETES_HELM, KUBERNETES_KUBECONFORM, KUBERNETES_KUBESCAPE, MAKEFILE_CHECKMAKE, MARKDOWN_MARKDOWN_LINK_CHECK, MARKDOWN_REMARK_LINT, PYTHON_RUFF_FORMAT, REPOSITORY_DEVSKIM, REPOSITORY_GRYPE, REPOSITORY_KICS, REPOSITORY_LS_LINT, REPOSITORY_SEMGREP, REPOSITORY_TRIVY, SALESFORCE_LIGHTNING_FLOW_SCANNER, SALESFORCE_SFDX_SCANNER_APEX, SALESFORCE_SFDX_SCANNER_AURA, SALESFORCE_SFDX_SCANNER_LWC, SPELL_CSPELL, SPELL_LYCHEE, SPELL_PROSELINT, SPELL_VALE, SQL_SQLFLUFF, SWIFT_SWIFTLINT, TSX_ESLINT, TYPESCRIPT_ES, TYPESCRIPT_PRETTIER
+To receive reports as email, please set variable EMAIL_REPORTER_EMAIL
+[ApiReporter] Not enabled as API_REPORTER is not defined to true
+
+MegaLinter now collects the files to analyse
+Listing all files in directory [/tmp/lint], then filter with:
+- File extensions: , .R, .RMD, .Rmd, .bash, .bicep, .c, .c++, .cc, .cdxml, .clj, .cljc, .cljs, .coffee, .config, .cpp, .cs, .csproj, .css, .cu, .cuh, .cxx, .dart, .dash, .edn, .env, .feature, .go, .gradle, .graphql, .groovy, .gvy, .h, .h++, .hcl, .hh, .hpp, .htm, .html, .hxx, .java, .js, .json, .ksh, .kt, .kts, .lua, .md, .nf, .p6, .php, .pl, .pl6, .pm, .pm6, .pp, .props, .proto, .ps1, .ps1xml, .psd1, .psm1, .psrc, .pssc, .py, .r, .raku, .rakumod, .rakutest, .rb, .rs, .rst, .saas, .scala, .scss, .sh, .smk, .sql, .t, .targets, .tex, .tf, .ts, .vb, .xml, .xsd, .yaml, .yml
+- File names (regex): Dockerfile, Jenkinsfile, Snakefile
+- Excluding .gitignored files [1]: megalinter-reports/IDE-config/.idea/externalDependencies.xml
+Kept [17] files on [20] found files
+
++----MATCHING LINTERS-----------------------+-----------------------+----------------+------------+
+| Descriptor     | Linter                   | Criteria              | Matching files | Format/Fix |
++----------------+--------------------------+-----------------------+----------------+------------+
+| ACTION         | actionlint               | .yml|.yaml            | 1              | no         |
+| BASH           | bash-exec                | |.sh|.bash|.dash|.ksh | 1              | no         |
+| BASH           | shellcheck               | |.sh|.bash|.dash|.ksh | 1              | no         |
+| BASH           | shfmt                    | |.sh|.bash|.dash|.ksh | 1              | no         |
+| DOCKERFILELINT | dockerfilelint           | Dockerfile            | 1              | no         |
+| GO             | revive                   | .go                   | 4              | no         |
+| JSON           | jsonlint                 | .json                 | 1              | no         |
+| JSON           | v8r                      | .json                 | 1              | no         |
+| JSON           | prettier                 | .json                 | 1              | no         |
+| MARKDOWN       | markdownlint             | .md                   | 1              | no         |
+| MARKDOWN       | markdown-table-formatter | .md                   | 1              | no         |
+| REPOSITORY     | checkov                  |                       | project        | no         |
+| REPOSITORY     | dustilock                |                       | project        | no         |
+| REPOSITORY     | git_diff                 |                       | project        | no         |
+| REPOSITORY     | gitleaks                 |                       | project        | no         |
+| REPOSITORY     | secretlint               |                       | project        | no         |
+| REPOSITORY     | syft                     |                       | project        | no         |
+| REPOSITORY     | trivy-sbom               |                       | project        | no         |
+| REPOSITORY     | trufflehog               |                       | project        | no         |
+| YAML           | prettier                 | .yml|.yaml            | 4              | no         |
+| YAML           | yamllint                 | .yml|.yaml            | 4              | no         |
+| YAML           | v8r                      | .yml|.yaml            | 4              | no         |
++----------------+--------------------------+-----------------------+----------------+------------+
+
+Processing linters on [4] parallel cores… (can be decreased with variable PARALLEL_PROCESS_NUMBER in case of performance issues)
+[32m✅ Linted [REPOSITORY] files with [secretlint] successfully - (1.06s)[0m
+- Using [secretlint v10.1.0] https://megalinter.io/8.8.0/descriptors/repository_secretlint
+- MegaLinter key: [REPOSITORY_SECRETLINT]
+- Rules config: [.secretlintrc.json]
+- Command: [secretlint --secretlintrc /action/lib/.automation/.secretlintrc.json --secretlintignore .gitignore **/*]
+
+[32m✅ Linted [REPOSITORY] files with [trivy-sbom] successfully - (3.49s)[0m
+- Using [trivy-sbom v0.63.0] https://megalinter.io/8.8.0/descriptors/repository_trivy_sbom
+- MegaLinter key: [REPOSITORY_TRIVY_SBOM]
+- Rules config: identified by [trivy-sbom]
+- Command: [trivy fs --format cyclonedx .]
+
+[32m✅ Linted [JSON] files with [v8r] successfully - (7.02s)[0m
+- Using [v8r v5.0.0] https://megalinter.io/8.8.0/descriptors/json_v8r
+- MegaLinter key: [JSON_V8R]
+- Rules config: identified by [v8r]
+- Number of files analyzed: [1]
+- Command: [v8r --ignore-errors .markdownlint.json]
+
+[32m✅ Linted [ACTION] files with [actionlint] successfully - (0.07s)[0m
+- Using [actionlint v1.7.7] https://megalinter.io/8.8.0/descriptors/action_actionlint
+- MegaLinter key: [ACTION_ACTIONLINT]
+- Rules config: identified by [actionlint]
+- Number of files analyzed: [1]
+- Command: [actionlint .github/workflows/main.yml]
+
+[32m✅ Linted [BASH] files with [bash-exec] successfully - (0.0s)[0m
+- Using [bash-exec v5.2.37] https://megalinter.io/8.8.0/descriptors/bash_bash_exec
+- MegaLinter key: [BASH_EXEC]
+- Rules config: identified by [bash-exec]
+- Number of files analyzed: [1]
+- Command: [bash-exec .version.sh]
+
+[32m✅ Linted [BASH] files with [shellcheck] successfully - (0.01s)[0m
+- Using [shellcheck v0.10.0] https://megalinter.io/8.8.0/descriptors/bash_shellcheck
+- MegaLinter key: [BASH_SHELLCHECK]
+- Rules config: identified by [shellcheck]
+- Number of files analyzed: [1]
+- Command: [shellcheck --color=auto --external-sources .version.sh]
+
+[32m✅ Linted [BASH] files with [shfmt] successfully - (0.0s)[0m
+- Using [shfmt v3.11.0] https://megalinter.io/8.8.0/descriptors/bash_shfmt
+- MegaLinter key: [BASH_SHFMT]
+- Rules config: identified by [shfmt]
+- Number of files analyzed: [1]
+- Command: [shfmt -d .version.sh]
+
+[32m✅ Linted [DOCKERFILELINT] files with [dockerfilelint] successfully - (0.23s)[0m
+- Using [dockerfilelint v1.8.0] https://github.com/replicatedhq/dockerfilelint
+- MegaLinter key: [DOCKERFILELINT_DOCKERFILELINT]
+- Rules config: identified by [dockerfilelint]
+- Number of files analyzed: [1]
+- Command: [dockerfilelint Dockerfile]
+
+[32m✅ Linted [REPOSITORY] files with [trufflehog] successfully - (4.12s)[0m
+- Using [trufflehog v3.89.1] https://megalinter.io/8.8.0/descriptors/repository_trufflehog
+- MegaLinter key: [REPOSITORY_TRUFFLEHOG]
+- Rules config: identified by [trufflehog]
+- Command: [trufflehog filesystem . --fail --only-verified --no-update --exclude-paths=/action/lib/.automation/.trufflehogignore]
+
+[32m✅ Linted [JSON] files with [jsonlint] successfully - (0.49s)[0m
+- Using [jsonlint v16.0.0] https://megalinter.io/8.8.0/descriptors/json_jsonlint
+- MegaLinter key: [JSON_JSONLINT]
+- Rules config: identified by [jsonlint]
+- Number of files analyzed: [1]
+- Command: [jsonlint --quiet .markdownlint.json]
+
+[32m✅ Linted [JSON] files with [prettier] successfully - (1.12s)[0m
+- Using [prettier v3.5.3] https://megalinter.io/8.8.0/descriptors/json_prettier
+- MegaLinter key: [JSON_PRETTIER]
+- Rules config: identified by [prettier]
+- Number of files analyzed: [1]
+- Command: [prettier --check .markdownlint.json]
+
+[32m✅ Linted [MARKDOWN] files with [markdownlint] successfully - (1.06s)[0m
+- Using [markdownlint v0.45.0] https://megalinter.io/8.8.0/descriptors/markdown_markdownlint
+- MegaLinter key: [MARKDOWN_MARKDOWNLINT]
+- Rules config: [/.markdownlint.json]
+- Number of files analyzed: [1]
+- Command: [markdownlint -c /tmp/lint/.markdownlint.json README.md]
+
+[32m✅ Linted [MARKDOWN] files with [markdown-table-formatter] successfully - (0.49s)[0m
+- Using [markdown-table-formatter v1.6.1] https://megalinter.io/8.8.0/descriptors/markdown_markdown_table_formatter
+- MegaLinter key: [MARKDOWN_MARKDOWN_TABLE_FORMATTER]
+- Rules config: identified by [markdown-table-formatter]
+- Number of files analyzed: [1]
+- Command: [markdown-table-formatter --check README.md]
+
+[32m✅ Linted [REPOSITORY] files with [dustilock] successfully - (0.01s)[0m
+- Using [dustilock v1.2.0] https://megalinter.io/8.8.0/descriptors/repository_dustilock
+- MegaLinter key: [REPOSITORY_DUSTILOCK]
+- Rules config: identified by [dustilock]
+- Command: [dustilock --recursive]
+
+[32m✅ Linted [REPOSITORY] files with [gitleaks] successfully - (0.23s)[0m
+- Using [gitleaks v8.27.2] https://megalinter.io/8.8.0/descriptors/repository_gitleaks
+- MegaLinter key: [REPOSITORY_GITLEAKS]
+- Rules config: [.gitleaks.toml]
+- Command: [gitleaks detect --redact -c /action/lib/.automation/.gitleaks.toml --verbose --source .]
+
+[32m✅ Linted [REPOSITORY] files with [syft] successfully - (2.92s)[0m
+- Using [syft v1.27.1] https://megalinter.io/8.8.0/descriptors/repository_syft
+- MegaLinter key: [REPOSITORY_SYFT]
+- Rules config: identified by [syft]
+- Command: [syft scan .]
+
+Unable to get number of errors with regex_count and \[error\]
+[33m⚠️ Linted [YAML] files with [prettier]: Found 1 non blocking error(s) and 2 non blocking warning(s) - (0.59s)[0m
+- Using [prettier v3.5.3] https://megalinter.io/8.8.0/descriptors/yaml_prettier
+- MegaLinter key: [YAML_PRETTIER]
+- Rules config: identified by [prettier]
+- Number of files analyzed: [4]
+- Command: [prettier --check .checkov.yml .github/workflows/main.yml .golangci.yml .mega-linter.yml]
+--Error detail:
+Checking formatting...
+[warn] .golangci.yml
+[warn] Code style issues found in the above file. Run Prettier with --write to fix.
+
+
+[31m❌ Linted [YAML] files with [yamllint]: Found 1 error(s) and 0 warning(s) - (0.36s)[0m
+- Using [yamllint v1.37.1] https://megalinter.io/8.8.0/descriptors/yaml_yamllint
+- MegaLinter key: [YAML_YAMLLINT]
+- Rules config: [.yamllint.yml]
+- Number of files analyzed: [4]
+- Command: [yamllint --format standard -c /action/lib/.automation/.yamllint.yml .checkov.yml .github/workflows/main.yml .golangci.yml .mega-linter.yml]
+--Error detail:
+.golangci.yml
+  1:61      error    trailing spaces  (trailing-spaces)
+
+
+
+[31m❌ Linted [REPOSITORY] files with [git_diff]: Found 1 error(s) and 0 warning(s) - (0.01s)[0m
+- Using [git_diff v2.47.2] https://megalinter.io/8.8.0/descriptors/repository_git_diff
+- MegaLinter key: [REPOSITORY_GIT_DIFF]
+- Rules config: identified by [git_diff]
+- Command: [git diff --check]
+--Error detail:
+warning: in the working copy of '.golangci.yml', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.mega-linter.yml', LF will be replaced by CRLF the next time Git touches it
+.golangci.yml:1: trailing whitespace.
++# https://megalinter.io/latest/descriptors/go_golangci_lint/  
+
+
+[32m✅ Linted [GO] files with [revive] successfully - (16.79s)[0m
+- Using [revive v1.10.0] https://megalinter.io/8.8.0/descriptors/go_revive
+- MegaLinter key: [GO_REVIVE]
+- Rules config: [/.revive.toml]
+- Number of files analyzed: [4]
+- Command: [revive -set_exit_status -config /tmp/lint/.revive.toml gmail_auth.go gmail_help.go main.go util.go]
+
+[32m✅ Linted [YAML] files with [v8r] successfully - (25.73s)[0m
+- Using [v8r v5.0.0] https://megalinter.io/8.8.0/descriptors/yaml_v8r
+- MegaLinter key: [YAML_V8R]
+- Rules config: identified by [v8r]
+- Number of files analyzed: [4]
+- Command: [v8r --ignore-errors .checkov.yml .github/workflows/main.yml .golangci.yml .mega-linter.yml]
+
+[32m✅ Linted [REPOSITORY] files with [checkov] successfully - (43.58s)[0m
+- Using [checkov v3.2.413] https://megalinter.io/8.8.0/descriptors/repository_checkov
+- MegaLinter key: [REPOSITORY_CHECKOV]
+- Rules config: [/.checkov.yml]
+- Command: [checkov --directory . --config-file /tmp/lint/.checkov.yml]
+
+[Updated Sources Reporter] copied 2 fixed source files in folder /tmp/lint/megalinter-reports/updated_sources.
+
++----SUMMARY--------+--------------------------+---------------+-------+-------+--------+----------+--------------+
+| Descriptor        | Linter                   | Mode          | Files | Fixed | Errors | Warnings | Elapsed time |
++-------------------+--------------------------+---------------+-------+-------+--------+----------+--------------+
+| ✅ ACTION         | actionlint               | list_of_files |     1 |       |      0 |        0 | 0.07s        |
+| ✅ BASH           | bash-exec                | file          |     1 |       |      0 |        0 | 0.0s         |
+| ✅ BASH           | shellcheck               | list_of_files |     1 |       |      0 |        0 | 0.01s        |
+| ✅ BASH           | shfmt                    | list_of_files |     1 |       |      0 |        0 | 0.0s         |
+| ✅ DOCKERFILELINT | dockerfilelint           | list_of_files |     1 |       |      0 |        0 | 0.23s        |
+| ✅ GO             | revive                   | list_of_files |     4 |       |      0 |        0 | 16.79s       |
+| ✅ JSON           | jsonlint                 | list_of_files |     1 |       |      0 |        0 | 0.49s        |
+| ✅ JSON           | prettier                 | list_of_files |     1 |       |      0 |        0 | 1.12s        |
+| ✅ JSON           | v8r                      | list_of_files |     1 |       |      0 |        0 | 7.02s        |
+| ✅ MARKDOWN       | markdownlint             | list_of_files |     1 |       |      0 |        0 | 1.06s        |
+| ✅ MARKDOWN       | markdown-table-formatter | list_of_files |     1 |       |      0 |        0 | 0.49s        |
+| ✅ REPOSITORY     | checkov                  | project       |   n/a |       |      0 |        0 | 43.58s       |
+| ✅ REPOSITORY     | dustilock                | project       |   n/a |       |      0 |        0 | 0.01s        |
+| ✅ REPOSITORY     | gitleaks                 | project       |   n/a |       |      0 |        0 | 0.23s        |
+| ❌ REPOSITORY     | git_diff                 | project       |   n/a |       |      1 |        0 | 0.01s        |
+| ✅ REPOSITORY     | secretlint               | project       |   n/a |       |      0 |        0 | 1.06s        |
+| ✅ REPOSITORY     | syft                     | project       |   n/a |       |      0 |        0 | 2.92s        |
+| ✅ REPOSITORY     | trivy-sbom               | project       |   n/a |       |      0 |        0 | 3.49s        |
+| ✅ REPOSITORY     | trufflehog               | project       |   n/a |       |      0 |        0 | 4.12s        |
+| ⚠️ YAML           | prettier                 | list_of_files |     4 |       |      1 |        2 | 0.59s        |
+| ✅ YAML           | v8r                      | list_of_files |     4 |       |      0 |        0 | 25.73s       |
+| ❌ YAML           | yamllint                 | list_of_files |     4 |       |      1 |        0 | 0.36s        |
++-------------------+--------------------------+---------------+-------+-------+--------+----------+--------------+
+
+[flavors] You could have same capabilities but better runtime performances if you request a new MegaLinter flavor.
+[flavors] Use the following link to request the new flavor: https://github.com/oxsecurity/megalinter/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=Request%20new%20MegaLinter%20flavor&body=MegaLinter%20would%20run%20faster%20on%20my%20project%20if%20I%20had%20a%20flavor%20containing%20the%20following%20list%20of%20linters%3A%0A%0AACTION_ACTIONLINT%2C%20BASH_EXEC%2C%20BASH_SHELLCHECK%2C%20BASH_SHFMT%2C%20DOCKERFILELINT_DOCKERFILELINT%2C%20GO_REVIVE%2C%20JSON_JSONLINT%2C%20JSON_V8R%2C%20JSON_PRETTIER%2C%20MARKDOWN_MARKDOWNLINT%2C%20MARKDOWN_MARKDOWN_TABLE_FORMATTER%2C%20REPOSITORY_CHECKOV%2C%20REPOSITORY_GIT_DIFF%2C%20REPOSITORY_GITLEAKS%2C%20REPOSITORY_SECRETLINT%2C%20REPOSITORY_TRIVY_SBOM%2C%20REPOSITORY_TRUFFLEHOG%2C%20YAML_PRETTIER%2C%20YAML_YAMLLINT%2C%20YAML_V8R%0A%0AWould%20it%20be%20possible%20to%20create%20one%20%3F%20Thanks%20%3Arelaxed%3A
+
+[31m❌ Error(s) have been found during linting[0m
+To disable linters or customize their checks, you can use a .mega-linter.yml file at the root of your repository
+More info at https://megalinter.io/8.8.0/configuration/

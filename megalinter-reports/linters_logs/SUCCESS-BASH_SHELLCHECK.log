@@ -1,0 +1,5 @@
+Results of shellcheck linter (version 0.10.0)
+See documentation on https://megalinter.io/8.8.0/descriptors/bash_shellcheck/
+-----------------------------------------------
+
+✅ [SUCCESS] for workspace /tmp/lint

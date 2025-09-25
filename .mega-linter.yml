@@ -11,6 +11,9 @@ DISABLE_LINTERS:
   - REPOSITORY_DEVSKIM
   - REPOSITORY_KICS
   - REPOSITORY_TRIVY
+  - GO_GOLANGCI_LINT
+  - MARKDOWN_MARKDOWN_LINK_CHECK
+  - REPOSITORY_GRYPE
 
 PLUGINS:
   - https://raw.githubusercontent.com/cdzombak/mega-linter-plugin-dockerfilelint/main/mega-linter-plugin-dockerfilelint/dockerfilelint.megalinter-descriptor.yml

@@ -1,0 +1,50 @@
+[0000] ERROR failed to fetch latest version: Get "https://toolbox-data.anchore.io/syft/releases/latest/VERSION": dial tcp: lookup toolbox-data.anchore.io on 168.63.129.16:53: server misbehaving
+[0000]  WARN no explicit name and version provided for directory source, deriving artifact ID from the given path (which is not ideal)
+NAME                                                VERSION                                   TYPE                          
+Justintime50/homebrew-releaser                      v2                                        github-action                  
+actions/checkout                                    v5                                        github-action                  
+actions/download-artifact                           v5                                        github-action                  
+actions/setup-go                                    v6                                        github-action                  
+actions/upload-artifact                             v4                                        github-action                  
+cloud.google.com/go/compute/metadata                v0.2.3                                    go-module                      
+cloud.google.com/go/longrunning                     v0.5.4                                    go-module                      
+cloud.google.com/go/vision                          v1.2.0                                    go-module      (+1 duplicate)  
+cloud.google.com/go/vision/v2                       v2.7.5                                    go-module                      
+docker/build-push-action                            v6                                        github-action                  
+docker/login-action                                 v3                                        github-action                  
+docker/metadata-action                              v5                                        github-action                  
+docker/setup-buildx-action                          v3                                        github-action                  
+docker/setup-qemu-action                            v3                                        github-action                  
+github.com/JohannesKaufmann/html-to-markdown        v1.4.1                                    go-module      (+1 duplicate)  
+github.com/PuerkitoBio/goquery                      v1.8.1                                    go-module                      
+github.com/andybalholm/cascadia                     v1.3.2                                    go-module      (+1 duplicate)  
+github.com/golang/groupcache                        v0.0.0-20210331224755-41bb18bfe9da        go-module                      
+github.com/golang/protobuf                          v1.5.3                                    go-module                      
+github.com/google/s2a-go                            v0.1.7                                    go-module                      
+github.com/google/uuid                              v1.4.0                                    go-module                      
+github.com/googleapis/enterprise-certificate-proxy  v0.3.2                                    go-module                      
+github.com/googleapis/gax-go/v2                     v2.12.0                                   go-module                      
+go.opencensus.io                                    v0.24.0                                   go-module                      
+golang.org/x/crypto                                 v0.15.0                                   go-module                      
+golang.org/x/net                                    v0.18.0                                   go-module                      
+golang.org/x/oauth2                                 v0.14.0                                   go-module      (+1 duplicate)  
+golang.org/x/sync                                   v0.5.0                                    go-module                      
+golang.org/x/sys                                    v0.14.0                                   go-module                      
+golang.org/x/text                                   v0.14.0                                   go-module                      
+golang.org/x/time                                   v0.4.0                                    go-module      (+1 duplicate)  
+google.golang.org/api                               v0.150.0                                  go-module      (+1 duplicate)  
+google.golang.org/appengine                         v1.6.8                                    go-module                      
+google.golang.org/genproto                          v0.0.0-20231106174013-bbf56f31fb17        go-module      (+1 duplicate)  
+google.golang.org/genproto/googleapis/api           v0.0.0-20231106174013-bbf56f31fb17        go-module      (+1 duplicate)  
+google.golang.org/genproto/googleapis/rpc           v0.0.0-20231106174013-bbf56f31fb17        go-module      (+1 duplicate)  
+google.golang.org/grpc                              v1.59.0                                   go-module                      
+google.golang.org/protobuf                          v1.31.0                                   go-module                      
+mailto-things                                       v0.0.0-20250925124636-140b9d03b359+dirty  go-module                      
+niniyas/ntfy-action                                 v1.0.5                                    github-action                  
+oxsecurity/megalinter                               v9                                        github-action                  
+peter-evans/dockerhub-description                   v4                                        github-action                  
+ruby/setup-ruby                                     v1                                        github-action                  
+sersoft-gmbh/running-release-tags-action            v3                                        github-action                  
+softprops/action-gh-release                         v2                                        github-action                  
+stdlib                                              go1.24.7                                  go-module                      
+tailscale/github-action                             v3                                        github-action

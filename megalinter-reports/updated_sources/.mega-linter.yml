@@ -1,0 +1,26 @@
+# https://megalinter.io/configuration/
+---
+VALIDATE_ALL_CODEBASE: true
+
+DISABLE:
+  - COPYPASTE
+  - DOCKERFILE
+  - SPELL
+DISABLE_LINTERS:
+  - MAKEFILE_CHECKMAKE
+  - REPOSITORY_DEVSKIM
+  - REPOSITORY_KICS
+  - REPOSITORY_TRIVY
+  - GO_GOLANGCI_LINT
+  - MARKDOWN_MARKDOWN_LINK_CHECK
+  - REPOSITORY_GRYPE
+
+PLUGINS:
+  - https://raw.githubusercontent.com/cdzombak/mega-linter-plugin-dockerfilelint/main/mega-linter-plugin-dockerfilelint/dockerfilelint.megalinter-descriptor.yml
+
+GO_GOLANGCI_LINT_ARGUMENTS: --timeout=10m
+GO_REVIVE_CONFIG_FILE: ".revive.toml"
+
+SHOW_ELAPSED_TIME: false
+FILEIO_REPORTER: false
+PRINT_ALPACA: false
