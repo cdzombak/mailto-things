@@ -5,7 +5,6 @@ version: "2"
 
 linters:
   enable:
-    - gosimple
     - govet
     - ineffassign
     - staticcheck
