@@ -4,19 +4,13 @@
 version: "2"
 
 linters:
-  enable:
-    - gofmt
-    - gosimple
-    - govet
-    - ineffassign
-    - staticcheck
-    - unused
+  enable-all: true
 
 linters-settings:
   gocritic:
     disabled-checks:
       - exitAfterDefer
-  staticcheck:    
+  staticcheck:
     checks:
       - all
       - "-SA1019"
