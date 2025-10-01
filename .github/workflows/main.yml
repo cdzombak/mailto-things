@@ -75,6 +75,15 @@ jobs:
       is_pull_request: ${{ github.event_name == 'pull_request' }}
       is_running_version_tag_update: ${{ steps.running_version_tag.outputs.is_running_version_tag_update }}
 
+  actionlint:
+    name: Lint Workflows
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Run actionlint
+        uses: raven-actions/actionlint@v2
+
   lint:
     name: Lint
     runs-on: ubuntu-latest
