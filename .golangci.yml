@@ -4,11 +4,7 @@
 version: "2"
 
 linters:
-  enable:
-    - govet
-    - ineffassign
-    - staticcheck
-    - unused
+  enable-all: true
 
 linters-settings:
   gocritic:
