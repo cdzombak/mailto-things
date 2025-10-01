@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -19,7 +18,7 @@ import (
 func buildGmailService(ctx context.Context) (*gmail.Service, error) {
 	configDir := MustGetenv(envVarConfigDir)
 	credentialsFilename := path.Join(configDir, "credentials.json")
-	b, err := ioutil.ReadFile(credentialsFilename)
+	b, err := os.ReadFile(credentialsFilename)
 	if err != nil {
 		return nil, fmt.Errorf("unable to read client credentials file (credentials.json): %w", err)
 	}
