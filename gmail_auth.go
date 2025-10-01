@@ -72,9 +72,7 @@ func tokenFromFile(file string) (*oauth2.Token, error) {
 		return nil, err
 	}
 	defer func() {
-		if cerr := f.Close(); cerr != nil && err == nil {
-			err = cerr
-		}
+		_ = f.Close()
 	}()
 	tok := &oauth2.Token{}
 	err = json.NewDecoder(f).Decode(tok)
@@ -89,9 +87,7 @@ func saveToken(path string, token *oauth2.Token) {
 		log.Fatalf("Unable to cache oauth token: %v", err)
 	}
 	defer func() {
-		if err := f.Close(); err != nil {
-			log.Fatalf("Unable to close oauth token file: %v", err)
-		}
+		_ = f.Close()
 	}()
 	if err := json.NewEncoder(f).Encode(token); err != nil {
 		log.Fatalf("Unable to encode oauth token: %v", err)

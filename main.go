@@ -303,9 +303,7 @@ func ocrAttachment(filename string, gVision *vision.ImageAnnotatorClient) (strin
 		return "", err
 	}
 	defer func() {
-		if cerr := f.Close(); cerr != nil && err == nil {
-			err = cerr
-		}
+		_ = f.Close()
 	}()
 
 	image, err := vision.NewImageFromReader(f)
