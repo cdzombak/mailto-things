@@ -5,7 +5,6 @@ version: "2"
 
 linters:
   enable:
-    - gofmt
     - gosimple
     - govet
     - ineffassign
@@ -16,7 +15,7 @@ linters-settings:
   gocritic:
     disabled-checks:
       - exitAfterDefer
-  staticcheck:    
+  staticcheck:
     checks:
       - all
       - "-SA1019"
